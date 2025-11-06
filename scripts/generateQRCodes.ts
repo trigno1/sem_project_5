@@ -26,10 +26,20 @@ async function main() {
   // Loop through all NFTs
   for (const nft of nfts) {
     try {
-      const fileName = `${nft.id || nft.name.replace(/\s+/g, "_")}.png`;
+      // 🧹 Ensure the ID is clean — no nested URLs
+      let nftId = nft.id;
+      if (typeof nftId === "string" && nftId.includes("?id=")) {
+        try {
+          const parsed = new URL(nftId);
+          const clean = parsed.searchParams.get("id");
+          if (clean) nftId = clean;
+        } catch {}
+      }
+
+      const fileName = `${nftId || nft.name.replace(/\s+/g, "_")}.png`;
       const filePath = path.join(outputDir, fileName);
       const url = `${normalizedBase.replace(/\/$/, "")}/claim?id=${encodeURIComponent(
-        nft.id
+        nftId
       )}`;
 
       // Generate the QR code file

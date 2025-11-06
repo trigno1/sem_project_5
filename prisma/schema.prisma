@@ -13,6 +13,7 @@ model NFT {
   description String
   minted      Boolean
   image       String
+  attributes  Json? 
   owner       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

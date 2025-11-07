@@ -7,6 +7,13 @@ async function main() {
 
   const nfts = [
     {
+      id: "test",
+      name: "Test NFT",
+      description: "Just a sample NFT",
+      image: "https://placekitten.com/400/400",
+      minted: false,
+    }
+    {
       id: "cm2u3mgoz0008jap9x0xbxnjw",
       name: "Red Hexagon",
       description: "A red hexagon NFT from the Shapes Collection",

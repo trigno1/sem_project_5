@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 30 20% 98%; /* Warm off-white #faf9f6 */
+    --background: 0 0% 100%; /* Pure white */
     --foreground: 222 47% 11%; /* Deep slate/blue-gray */
 
     --card: 0 0% 100%;
@@ -16,8 +16,8 @@
     --primary: 262 83% 58%; /* Fuchsia accent */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 226 58% 39%; /* Sleek Indigo accent */
+    --secondary-foreground: 210 40% 98%;
 
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;

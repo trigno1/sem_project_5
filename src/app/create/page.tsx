@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Footer } from "@/components/footer";
+import { toast } from "sonner";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Purpose = "fun" | "event" | "other" | null;
@@ -163,14 +164,17 @@ export default function CreatePage() {
           password: form.password || undefined,
           isSoulbound: form.isSoulbound,
           externalUrl: form.externalUrl || undefined,
+          creatorAddress: account?.address || undefined,
         }),
       });
       const data = await res.json();
       if (res.ok) {
         setResult(data);
         setStep(3);
+        toast.success("QR Drop created!", { description: `"${form.name}" is live and ready to distribute.` });
       } else {
         setError(data.message || "Something went wrong.");
+        toast.error("Failed to create drop", { description: data.message });
       }
     } catch {
       setError("Network error. Please try again.");

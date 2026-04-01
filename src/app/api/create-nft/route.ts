@@ -19,6 +19,7 @@ export async function POST(request: Request) {
       password,
       isSoulbound,
       externalUrl,
+      creatorAddress,
     } = body;
 
     if (!name || !description || !image) {
@@ -42,6 +43,7 @@ export async function POST(request: Request) {
         password: password || null,
         isSoulbound: isSoulbound ?? false,
         externalUrl: externalUrl || null,
+        creatorAddress: creatorAddress || null,
         minted: false,
         claimsCount: 0,
       },

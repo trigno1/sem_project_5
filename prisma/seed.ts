@@ -51,7 +51,6 @@ async function main() {
       attributes: nft.attributes,
       minted: false,
     })),
-    skipDuplicates: true,
   });
 
   console.log("✅ NFT data seeded successfully!");

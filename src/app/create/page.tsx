@@ -214,7 +214,7 @@ export default function CreatePage() {
           {/* Step indicator */}
           <div className="flex items-center gap-2">
             {[1, 2, 3].map((s) => (
-              <div key={s} className={`h-2 rounded-full transition-all ${s === step ? "w-6 bg-indigo-600" : s < step ? "w-2 bg-indigo-300" : "w-2 bg-stone-200"}`} />
+              <div key={s} className={`h-2.5 rounded-full transition-all ${s === step ? "w-8 bg-indigo-600 shadow-sm" : s < step ? "w-2.5 bg-indigo-400" : "w-2.5 bg-stone-300"}`} />
             ))}
           </div>
         </div>

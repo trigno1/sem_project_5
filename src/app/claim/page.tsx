@@ -289,7 +289,7 @@ function ClaimContent() {
 
 export default function ClaimPage() {
   return (
-    <div className="min-h-screen bg-white relative selection:bg-indigo-500/30">
+    <div className="flex flex-col min-h-screen bg-white relative selection:bg-indigo-500/30">
       {/* Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-100/50 blur-[100px]" />
@@ -312,7 +312,7 @@ export default function ClaimPage() {
         </div>
       </header>
 
-      <main className="relative z-10 max-w-2xl mx-auto py-10 px-4">
+      <main className="flex-1 w-full relative z-10 max-w-2xl mx-auto py-10 px-4">
         <Suspense fallback={
           <div className="flex flex-col items-center justify-center py-24">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mb-6"></div>

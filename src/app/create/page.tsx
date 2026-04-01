@@ -212,9 +212,29 @@ export default function CreatePage() {
             <Image src="/logo.png" alt="Phygital Logo" width={24} height={24} className="rounded" /> Create Drop
           </div>
           {/* Step indicator */}
-          <div className="flex items-center gap-2">
-            {[1, 2, 3].map((s) => (
-              <div key={s} className={`h-2.5 rounded-full transition-all ${s === step ? "w-8 bg-indigo-600 shadow-sm" : s < step ? "w-2.5 bg-indigo-400" : "w-2.5 bg-stone-300"}`} />
+          <div className="hidden sm:flex items-center gap-1.5 bg-stone-50 border border-stone-200 p-1.5 rounded-full shadow-inner">
+            {[ 
+              { num: 1, label: "Details" }, 
+              { num: 2, label: "Media" }, 
+              { num: 3, label: "Options" } 
+            ].map((s) => (
+              <div 
+                key={s.num} 
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all text-xs font-bold leading-none ${
+                  s.num === step 
+                    ? "bg-indigo-600 shadow-sm text-white" 
+                    : s.num < step 
+                    ? "text-indigo-700 bg-indigo-100" 
+                    : "text-stone-400 font-semibold"
+                }`}
+              >
+                <div className={`flex items-center justify-center h-4 w-4 rounded-full text-[10px] ${
+                  s.num === step ? "bg-white text-indigo-600" : s.num < step ? "bg-indigo-600 text-white" : "bg-stone-200 text-stone-500"
+                }`}>
+                  {s.num < step ? "✓" : s.num}
+                </div>
+                {s.label}
+              </div>
             ))}
           </div>
         </div>

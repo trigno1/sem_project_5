@@ -10,58 +10,53 @@ const DEVELOPER = {
 };
 
 interface FooterProps {
-  dark?: boolean; // true = dark footer (matches dark pages), false = white footer
+  dark?: boolean;
 }
 
 export function Footer({ dark = false }: FooterProps) {
-  const bg = dark ? "bg-[#080818] border-white/5" : "bg-white border-stone-100";
-  const text = dark ? "text-white/25" : "text-stone-400";
+  const bg = dark ? "bg-[#050510] border-t border-white/5" : "bg-stone-50 border-t border-stone-200";
+  const textTitle = dark ? "text-white" : "text-stone-900";
+  const textSub = dark ? "text-white/50" : "text-stone-500";
   const hover = dark ? "hover:text-white" : "hover:text-stone-900";
-  const iconBg = dark ? "bg-white/5 border-white/10" : "bg-stone-50 border-stone-200";
+  const iconBg = dark ? "bg-white/5 border border-white/10" : "bg-white border border-stone-200 shadow-sm";
 
   return (
-    <footer className={`w-full border-t ${bg} px-6 py-8`}>
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+    <footer className={`w-full relative overflow-hidden py-10 md:py-14 ${bg}`}>
+      {/* Ambient top border glow for dark mode */}
+      {dark && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />}
+
+      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8 relative z-10 w-full">
         
-        {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className={`p-1 flex items-center justify-center rounded-lg border ${iconBg}`}>
-            <Image src="/logo.png" alt="Phygital Logo" width={20} height={20} className="rounded" />
+        {/* Brand section */}
+        <div className="flex flex-col items-center md:items-start text-center md:text-left">
+          <div className="flex items-center gap-3 mb-2">
+            <Image src="/logo.png" alt="Phygital Logo" width={32} height={32} className="rounded-xl shadow-sm" />
+            <span className={`text-xl font-black tracking-tight ${textTitle}`}>Phygital</span>
           </div>
-          <div>
-            <p className={`text-sm font-bold ${text}`}>Phygital Protocol</p>
-            <p className={`text-xs ${text} opacity-70`}>Physical NFT Drops on Base Sepolia</p>
-          </div>
+          <p className={`text-sm font-medium ${textSub}`}>Physical NFT Drops on Base Sepolia</p>
         </div>
 
-        {/* Developer credit */}
-        <div className={`text-center text-xs ${text}`}>
-          <p className="font-semibold mb-0.5">Developed &amp; Maintained by</p>
-          <p className="font-bold text-sm"
-            style={{ color: dark ? "rgba(255,255,255,0.5)" : "rgb(79 70 229)" }}>
+        {/* Developer Credit */}
+        <div className="text-center flex flex-col items-center">
+          <span className={`text-xs font-semibold uppercase tracking-widest mb-1 ${textSub}`}>Developed by</span>
+          <span className={`text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-violet-500`}>
             {DEVELOPER.name}
-          </p>
+          </span>
         </div>
 
-        {/* Social links */}
+        {/* Social interactions */}
         <div className="flex items-center gap-3">
-          <a href={DEVELOPER.github} target="_blank" rel="noopener noreferrer"
-            title="GitHub"
-            className={`p-2.5 rounded-xl border ${iconBg} ${text} ${hover} transition-colors`}>
-            <Github className="h-4 w-4" />
-          </a>
-          <a href={DEVELOPER.linkedin} target="_blank" rel="noopener noreferrer"
-            title="LinkedIn"
-            className={`p-2.5 rounded-xl border ${iconBg} ${text} ${hover} transition-colors`}>
-            <Linkedin className="h-4 w-4" />
-          </a>
-          <a href={`mailto:${DEVELOPER.email}`}
-            title="Email"
-            className={`p-2.5 rounded-xl border ${iconBg} ${text} ${hover} transition-colors`}>
-            <Mail className="h-4 w-4" />
-          </a>
+          {[
+            { icon: Github, href: DEVELOPER.github, title: "GitHub" },
+            { icon: Linkedin, href: DEVELOPER.linkedin, title: "LinkedIn" },
+            { icon: Mail, href: `mailto:${DEVELOPER.email}`, title: "Email" }
+          ].map((item, i) => (
+            <a key={i} href={item.href} target="_blank" rel="noopener noreferrer" title={item.title}
+              className={`p-3 rounded-full ${iconBg} ${textSub} ${hover} transition-all hover:scale-110 hover:-translate-y-1`}>
+              <item.icon className="h-4 w-4" />
+            </a>
+          ))}
         </div>
-
       </div>
     </footer>
   );

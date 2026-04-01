@@ -166,7 +166,7 @@ export function LandingPage() {
                 </span>
               </h1>
 
-              <p className="max-w-xl text-lg text-white/50 leading-relaxed font-medium mb-10">
+              <p className="max-w-xl text-lg text-white/80 leading-relaxed font-medium mb-10">
                 Phygital turns physical objects into on-chain NFT drops. Generate a QR code, print it anywhere, and let people claim a real ERC-1155 NFT to their invisible wallet — free, in seconds.
               </p>
 
@@ -336,9 +336,9 @@ export function LandingPage() {
                       <item.icon className="h-7 w-7 text-white" />
                     </div>
                   </div>
-                  <div className="text-4xl font-black text-white/10 mb-3">{item.step}</div>
+                  <div className="text-4xl font-black text-white/20 mb-3">{item.step}</div>
                   <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                  <p className="text-white/40 leading-relaxed">{item.desc}</p>
+                  <p className="text-white/70 leading-relaxed font-medium">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -403,7 +403,7 @@ export function LandingPage() {
                 went on-chain.
               </span>
             </h2>
-            <p className="text-xl text-white/40 max-w-xl font-medium mb-12">
+            <p className="text-xl text-white/70 max-w-xl font-medium mb-12">
               Create your first NFT drop or start collecting — all in under 60 seconds.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">

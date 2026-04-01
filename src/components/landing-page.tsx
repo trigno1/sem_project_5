@@ -252,6 +252,36 @@ export function LandingPage() {
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-emerald-300 text-xs font-bold">Tx confirmed</span>
               </div>
+
+              {/* Polaroid card: Create Collection */}
+              <div
+                className="animate-float absolute -left-36 bottom-16 w-32 bg-white z-5 p-2 pb-5"
+                style={{
+                  transform: "rotate(5deg)",
+                  boxShadow: "0 6px 24px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.20)",
+                  zIndex: 5,
+                }}
+              >
+                {/* Polaroid photo area */}
+                <div className="w-full aspect-square bg-gradient-to-br from-indigo-100 via-violet-100 to-fuchsia-100 flex flex-col items-center justify-center gap-1.5 mb-2 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.07)_1px,transparent_1px)] bg-[size:10px_10px]" />
+                  <div className="relative z-10 flex flex-col items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
+                      <QrCode className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="flex -space-x-1.5">
+                      {["bg-amber-400","bg-indigo-400","bg-fuchsia-400"].map((c, i) => (
+                        <div key={i} className={`w-4 h-4 rounded-full border-2 border-white ${c} shadow-sm`} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {/* Caption */}
+                <p className="text-center text-[9px] font-black text-stone-800 tracking-tight">Create Collection</p>
+                <p className="text-center text-[7px] text-stone-400 font-medium mt-0.5">Phygital Drop ✦</p>
+              </div>
+
+
             </div>
           </div>
         </section>

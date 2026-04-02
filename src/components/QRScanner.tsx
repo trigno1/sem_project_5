@@ -12,9 +12,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-const qrcodeRegionId = "html5qr-code-full-region";
-
 const QRScanner: React.FC = () => {
+  // Generate a unique ID so multiple QRScanners on the same page don't clash
+  const qrcodeRegionId = useRef(`qr-region-${Math.random().toString(36).substr(2, 9)}`).current;
   const [open, setOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const router = useRouter();

@@ -339,6 +339,44 @@ export default function CreatePage() {
                 />
               </div>
 
+              {/* Network Selection (In Testing) */}
+              <div>
+                <label className="block text-sm font-semibold text-stone-700 mb-2 flex items-center justify-between">
+                  <span className="flex items-center gap-2"><Globe className="h-4 w-4 text-emerald-500" /> Blockchain Network</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md border border-indigo-100">Multi-Chain Beta</span>
+                </label>
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between p-3 md:p-4 border-2 border-indigo-500 bg-indigo-50/40 rounded-xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500" />
+                    <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-full bg-[#0052FF] flex flex-shrink-0 items-center justify-center text-white font-bold text-sm shadow-inner overflow-hidden">
+                         <img src="https://cryptologos.cc/logos/base-logo.png?v=029" className="w-full h-full object-cover scale-[1.3] brightness-[1.5]" alt="Base" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                       </div>
+                       <div>
+                         <p className="font-bold text-stone-900 text-sm">Base Sepolia</p>
+                         <p className="text-xs text-stone-500 font-medium">Testnet • Currently Active</p>
+                       </div>
+                    </div>
+                    <CheckCircle2 className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 md:p-4 border border-stone-200 bg-stone-50/80 rounded-xl opacity-70 cursor-not-allowed cursor-help" title="Mainnet deployment is currently in beta testing">
+                    <div className="flex items-center gap-3">
+                       <div className="flex -space-x-2">
+                         <div className="w-8 h-8 rounded-full bg-[#627EEA] ring-2 ring-white flex items-center justify-center text-white text-[10px] font-bold z-30 shadow-sm">&Xi;</div>
+                         <div className="w-8 h-8 rounded-full bg-[#8247E5] ring-2 ring-white flex items-center justify-center text-white text-[10px] font-bold z-20 shadow-sm">P</div>
+                         <div className="w-8 h-8 rounded-full bg-[#14F195] ring-2 ring-white flex items-center justify-center text-stone-900 text-[10px] font-bold z-10 shadow-sm">S</div>
+                       </div>
+                       <div className="ml-2">
+                         <p className="font-bold text-stone-900 text-sm flex items-center gap-2">Mainnets <span className="bg-amber-100 text-amber-700 text-[9px] uppercase px-1.5 py-0.5 rounded font-black tracking-wider border border-amber-200">In Testing</span></p>
+                         <p className="text-xs text-stone-500 font-medium leading-tight mt-0.5">Ethereum, Polygon, Solana, Base</p>
+                       </div>
+                    </div>
+                    <Lock className="h-4 w-4 text-stone-400" />
+                  </div>
+                </div>
+              </div>
+
               {/* Image Upload + URL */}
               <div>
                 <label className="block text-sm font-semibold text-stone-700 mb-2">

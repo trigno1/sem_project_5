@@ -15,7 +15,7 @@ import {
 
 import { inAppWallet } from "thirdweb/wallets";
 import { client, chain } from "@/app/const/client";
-import { QrCode, ArrowLeft, AlertTriangle } from "lucide-react";
+import { QrCode, ArrowLeft, AlertTriangle, Check, Sparkles, Twitter } from "lucide-react";
 import { Footer } from "@/components/footer";
 
 interface NFT {
@@ -255,8 +255,44 @@ function ClaimContent() {
           )}
 
           {nft.minted && (
-            <div className="w-full py-4 px-6 font-bold rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-center">
-              ✅ Already Claimed
+            <div className="w-full flex flex-col items-center mt-6">
+              {/* Flex Card */}
+              <div className="w-full bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 rounded-2xl p-1 shadow-md mb-4">
+                <div className="bg-white rounded-xl p-5 flex flex-col items-center relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-100/50 rounded-full blur-3xl -z-10" />
+                  <div className="mx-auto w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
+                    <Check className="h-5 w-5 text-emerald-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-stone-900 text-center mb-1">Successfully Claimed!</h3>
+                  <p className="text-stone-500 text-sm text-center mb-4">
+                    You are now the official owner of this Phygital asset.
+                  </p>
+                  
+                  <div className="w-32 h-32 rounded-xl overflow-hidden shadow-sm border border-stone-100 bg-stone-50 mb-3 flex items-center justify-center">
+                    <img
+                      src={nft.image?.replace("ipfs://", "https://ipfs.io/ipfs/")}
+                      className="w-full h-full object-cover"
+                      alt={nft.name}
+                    />
+                  </div>
+                  
+                  <p className="font-bold text-stone-800 text-center">{nft.name}</p>
+                  <div className="flex items-center gap-1.5 mt-2 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">
+                    <Sparkles className="w-3 h-3" /> Verified Phygital
+                  </div>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => {
+                  const tweetText = `I just claimed my Phygital asset: ${nft.name}! 🚀\n\nCheck it out here:`;
+                  const url = window.location.href;
+                  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(url)}`, '_blank');
+                }} 
+                className="w-full flex items-center justify-center py-4 text-base rounded-2xl bg-[#000000] hover:bg-stone-800 font-bold text-white shadow hover:shadow-md transition-all"
+              >
+                <Twitter className="mr-2 h-5 w-5 fill-current" /> Share on X
+              </button>
             </div>
           )}
 

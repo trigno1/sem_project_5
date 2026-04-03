@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Check, Sparkles, Tag } from "lucide-react"
+import { ArrowLeft, Check, Sparkles, Tag, Twitter } from "lucide-react"
 import { ConnectButton, lightTheme, MediaRenderer, useActiveAccount } from 'thirdweb/react'
 import { chain, client } from '@/app/const/client'
 import ReactConfetti from 'react-confetti'
@@ -190,24 +190,56 @@ export function ClaimNft({ nft }: ClaimNftProps) {
       <Footer />
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="bg-white rounded-3xl border-stone-100 shadow-2xl sm:max-w-md p-8">
-          <DialogHeader className="text-center">
-            <div className="mx-auto w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
-              <Check className="h-8 w-8 text-emerald-500" />
+        <DialogContent className="bg-white rounded-3xl border-stone-100 shadow-2xl sm:max-w-md p-6">
+          <div className="flex flex-col items-center">
+            {/* Flex Card */}
+            <div className="w-full bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 rounded-2xl p-1 mb-6 shadow-lg">
+              <div className="bg-white rounded-xl p-5 flex flex-col items-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-100/50 rounded-full blur-3xl -z-10" />
+                <div className="mx-auto w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
+                  <Check className="h-6 w-6 text-emerald-500" />
+                </div>
+                <DialogTitle className="text-2xl font-bold text-stone-900 text-center mb-2">Successfully Claimed!</DialogTitle>
+                <DialogDescription className="text-stone-500 text-sm text-center mb-5">
+                  You are now the official owner of this Phygital asset.
+                </DialogDescription>
+                
+                <div className="w-40 h-40 rounded-xl overflow-hidden shadow-md border-2 border-white bg-stone-50 mb-4 flex items-center justify-center">
+                  <MediaRenderer
+                    client={client}
+                    src={nft.image}
+                    width='100%'
+                    height='100%'
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+                
+                <p className="font-bold text-stone-800 text-lg text-center">{nft.name}</p>
+                <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-full">
+                  <Sparkles className="w-3.5 h-3.5" /> Verified Phygital
+                </div>
+              </div>
             </div>
-            <DialogTitle className="text-2xl font-bold text-stone-900">Successfully Claimed!</DialogTitle>
-            <DialogDescription className="text-stone-500 text-base mt-2">
-              The NFT <b>{nft.name}</b> has been safely minted and sent to your wallet. You can now view it in your dashboard collection.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="mt-8 flex-col sm:flex-col gap-3">
-            <Button onClick={() => router.push('/dashboard')} className="w-full py-6 text-lg rounded-2xl bg-indigo-600 hover:bg-indigo-700 font-bold text-white">
-              Go to Dashboard
-            </Button>
-            <Button onClick={() => setShowModal(false)} variant="outline" className="w-full py-6 text-lg rounded-2xl border-stone-200 text-stone-600 hover:bg-stone-50 font-bold sm:ml-0">
-              Close
-            </Button>
-          </DialogFooter>
+
+            <div className="w-full flex flex-col gap-3">
+              <Button 
+                onClick={() => {
+                  const tweetText = `I just claimed my Phygital asset: ${nft.name}! 🚀\n\nCheck it out here:`;
+                  const url = window.location.href;
+                  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(url)}`, '_blank');
+                }} 
+                className="w-full py-6 text-lg rounded-2xl bg-[#000000] hover:bg-stone-800 font-bold text-white shadow-md hover:shadow-lg transition-all"
+              >
+                <Twitter className="mr-2 h-5 w-5 fill-current" /> Share on X
+              </Button>
+              <Button onClick={() => router.push('/dashboard')} className="w-full py-6 text-lg rounded-2xl bg-indigo-600 hover:bg-indigo-700 font-bold text-white shadow-md hover:shadow-lg transition-all">
+                Go to Dashboard
+              </Button>
+              <Button onClick={() => setShowModal(false)} variant="ghost" className="w-full py-6 text-stone-500 hover:text-stone-800 hover:bg-stone-50 font-semibold rounded-2xl">
+                Close
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

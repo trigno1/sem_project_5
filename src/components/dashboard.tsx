@@ -106,8 +106,8 @@ export function DashboardComponent() {
 
       {/* Background Ambience */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/40 blur-[100px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-100/30 blur-[100px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-200/40 blur-[100px] animate-aurora" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-200/30 blur-[100px] animate-aurora2" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50" />
       </div>
 
@@ -260,10 +260,17 @@ export function DashboardComponent() {
                         </div>
                       )
                     ) : (
-                      <div className="col-span-full py-20 flex flex-col items-center justify-center">
-                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-600 mb-6" />
-                        <p className="text-stone-500 font-medium tracking-wide">Syncing blockchain...</p>
-                      </div>
+                      <>
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <div key={i} className="bg-white border border-stone-100 p-3 rounded-2xl shadow-sm flex flex-col items-center animate-pulse">
+                            <div className="rounded-xl w-full aspect-square bg-stone-200 mb-4" />
+                            <div className="w-full text-left px-1 flex flex-col gap-2">
+                              <div className="h-3 bg-stone-200 rounded w-1/3" />
+                              <div className="h-4 bg-stone-200 rounded w-3/4" />
+                            </div>
+                          </div>
+                        ))}
+                      </>
                     )}
                   </div>
                 )}
@@ -272,9 +279,24 @@ export function DashboardComponent() {
                 {activeTab === "drops" && (
                   <div>
                     {dropsLoading ? (
-                      <div className="py-20 flex flex-col items-center justify-center">
-                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-600 mb-6" />
-                        <p className="text-stone-500 font-medium tracking-wide">Loading your drops...</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="bg-white border border-stone-100 rounded-2xl shadow-sm p-5 flex flex-col gap-4 animate-pulse">
+                            <div className="flex items-start gap-4">
+                              <div className="w-16 h-16 rounded-xl bg-stone-200 flex-shrink-0" />
+                              <div className="flex-1 flex flex-col gap-2">
+                                <div className="h-4 bg-stone-200 rounded w-1/2" />
+                                <div className="h-3 bg-stone-200 rounded w-full" />
+                                <div className="h-3 bg-stone-200 rounded w-3/4" />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 mt-2">
+                              <div className="bg-stone-50 rounded-lg h-12 border border-stone-100" />
+                              <div className="bg-stone-50 rounded-lg h-12 border border-stone-100" />
+                              <div className="bg-stone-50 rounded-lg h-12 border border-stone-100" />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ) : myDrops.length === 0 ? (
                       <div className="py-16 flex flex-col items-center justify-center bg-stone-50/50 border border-stone-200 border-dashed rounded-3xl mt-4 text-center px-4">

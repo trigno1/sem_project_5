@@ -181,142 +181,146 @@ function ClaimContent() {
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border border-stone-100 shadow-xl rounded-3xl w-full flex flex-col items-center overflow-hidden"
+        className="w-full relative"
       >
-        {/* Category badge */}
-        {nft.category && (
-          <div className="w-full bg-indigo-50 border-b border-indigo-100 px-6 py-2.5">
-            <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">{nft.category}</span>
-          </div>
-        )}
-
-        {/* NFT Image */}
-        <div className="w-full aspect-square bg-stone-50">
-          <img
-            src={nft.image?.replace("ipfs://", "https://ipfs.io/ipfs/")}
-            alt={nft.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* NFT Info */}
-        <div className="p-6 w-full">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-stone-900">{nft.name}</h2>
-            {nft.minted ? (
-              <span className="flex items-center gap-1.5 text-emerald-600 font-semibold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full text-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Minted
-              </span>
-            ) : (
-              <span className="flex items-center gap-1.5 text-amber-600 font-semibold bg-amber-50 border border-amber-200 px-3 py-1 rounded-full text-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Available
-              </span>
-            )}
-          </div>
-
-          <p className="text-stone-500 font-medium leading-relaxed mb-6">{nft.description}</p>
-
-          {/* Dates */}
-          {(nft.issuedAt || nft.expiresAt) && (
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              {nft.issuedAt && (
-                <div className="bg-stone-50 rounded-xl p-3 border border-stone-100">
-                  <p className="text-xs text-stone-400 font-bold uppercase tracking-wider mb-1">Live From</p>
-                  <p className="text-sm font-semibold text-stone-700">{new Date(nft.issuedAt).toLocaleDateString()}</p>
+        <div className="perspective-[1500px]">
+          <div className={`relative transition-transform duration-[800ms] preserve-3d w-full ${nft.minted ? "rotate-y-180" : ""}`}>
+            
+            {/* FRONT OF CARD (Available) */}
+            <div className={`bg-white border border-stone-100 shadow-xl rounded-3xl overflow-hidden w-full flex flex-col backface-hidden ${nft.minted ? "absolute top-0 left-0 opacity-0 pointer-events-none" : "relative"}`}>
+              {/* Category badge */}
+              {nft.category && (
+                <div className="w-full bg-indigo-50 border-b border-indigo-100 px-6 py-2.5">
+                  <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">{nft.category}</span>
                 </div>
               )}
-              {nft.expiresAt && (
-                <div className="bg-red-50 rounded-xl p-3 border border-red-100">
-                  <p className="text-xs text-red-400 font-bold uppercase tracking-wider mb-1">Expires</p>
-                  <p className="text-sm font-semibold text-red-700">{new Date(nft.expiresAt).toLocaleDateString()}</p>
-                </div>
-              )}
-            </div>
-          )}
 
-          {/* Claim button */}
-          {!nft.minted && (
-            <button
-              onClick={account ? handleClaim : handleConnect}
-              disabled={minting}
-              className={`w-full py-4 px-6 font-bold rounded-2xl transition-all text-base ${
-                minting
-                  ? "bg-stone-200 text-stone-500 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 hover:-translate-y-0.5"
-              }`}
-            >
-              {minting ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full"></span>
-                  Claiming...
-                </span>
-              ) : account ? "Claim NFT to My Wallet" : "Connect & Claim"}
-            </button>
-          )}
-
-          {nft.minted && (
-            <div className="w-full flex flex-col items-center mt-6">
-              {/* Flex Card */}
-              <div className="w-full bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 rounded-2xl p-1 shadow-md mb-4">
-                <div className="bg-white rounded-xl p-5 flex flex-col items-center relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-100/50 rounded-full blur-3xl -z-10" />
-                  <div className="mx-auto w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
-                    <Check className="h-5 w-5 text-emerald-500" />
-                  </div>
-                  <h3 className="text-xl font-bold text-stone-900 text-center mb-1">Successfully Claimed!</h3>
-                  <p className="text-stone-500 text-sm text-center mb-4">
-                    You are now the official owner of this Phygital asset.
-                  </p>
-                  
-                  <div className="w-32 h-32 rounded-xl overflow-hidden shadow-sm border border-stone-100 bg-stone-50 mb-3 flex items-center justify-center">
-                    <img
-                      src={nft.image?.replace("ipfs://", "https://ipfs.io/ipfs/")}
-                      className="w-full h-full object-cover"
-                      alt={nft.name}
-                    />
-                  </div>
-                  
-                  <p className="font-bold text-stone-800 text-center">{nft.name}</p>
-                  <div className="flex items-center gap-1.5 mt-2 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">
-                    <Sparkles className="w-3 h-3" /> Verified Phygital
-                  </div>
-                </div>
+              {/* NFT Image */}
+              <div className="w-full aspect-square bg-stone-50">
+                <img
+                  src={nft.image?.replace("ipfs://", "https://ipfs.io/ipfs/")}
+                  alt={nft.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
 
-              <button 
-                onClick={() => {
-                  const tweetText = `I just claimed my Phygital asset: ${nft.name}! 🚀\n\nCheck it out here:`;
-                  const url = window.location.href;
-                  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(url)}`, '_blank');
-                }} 
-                className="w-full flex items-center justify-center py-4 text-base rounded-2xl bg-[#000000] hover:bg-stone-800 font-bold text-white shadow hover:shadow-md transition-all"
-              >
-                <Twitter className="mr-2 h-5 w-5 fill-current" /> Share on X
-              </button>
-            </div>
-          )}
+              {/* NFT Info */}
+              <div className="p-6 w-full">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-stone-900">{nft.name}</h2>
+                  <span className="flex items-center gap-1.5 text-amber-600 font-semibold bg-amber-50 border border-amber-200 px-3 py-1 rounded-full text-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Available
+                  </span>
+                </div>
 
-          {message && (
-            <div className={`mt-4 p-3 rounded-xl text-sm font-medium w-full text-center ${
-              message.includes("🎉") || message.includes("successfully")
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                : message.includes("Claiming")
-                ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
-                : "bg-red-50 text-red-700 border border-red-200"
-            }`}>
-              {message}
-              {txHash && (
-                <a
-                  href={`https://sepolia.basescan.org/tx/${txHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block mt-2 text-indigo-600 font-semibold underline text-xs"
+                <p className="text-stone-500 font-medium leading-relaxed mb-6">{nft.description}</p>
+
+                {/* Dates */}
+                {(nft.issuedAt || nft.expiresAt) && (
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {nft.issuedAt && (
+                      <div className="bg-stone-50 rounded-xl p-3 border border-stone-100">
+                        <p className="text-xs text-stone-400 font-bold uppercase tracking-wider mb-1">Live From</p>
+                        <p className="text-sm font-semibold text-stone-700">{new Date(nft.issuedAt).toLocaleDateString()}</p>
+                      </div>
+                    )}
+                    {nft.expiresAt && (
+                      <div className="bg-red-50 rounded-xl p-3 border border-red-100">
+                        <p className="text-xs text-red-400 font-bold uppercase tracking-wider mb-1">Expires</p>
+                        <p className="text-sm font-semibold text-red-700">{new Date(nft.expiresAt).toLocaleDateString()}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Claim button */}
+                <button
+                  onClick={account ? handleClaim : handleConnect}
+                  disabled={minting}
+                  className={`w-full py-4 px-6 font-bold rounded-2xl transition-all text-base ${
+                    minting
+                      ? "bg-stone-200 text-stone-500 cursor-not-allowed"
+                      : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 hover:-translate-y-0.5"
+                  }`}
                 >
-                  View on BaseScan →
-                </a>
-              )}
+                  {minting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full"></span>
+                      Claiming...
+                    </span>
+                  ) : account ? "Claim NFT to My Wallet" : "Connect & Claim"}
+                </button>
+                {message && !message.includes("🎉") && (
+                  <div className="mt-4 p-3 rounded-xl text-sm font-medium w-full text-center bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    {message}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+
+            {/* BACK OF CARD (Successfully Minted) */}
+            <div className={`bg-white border border-stone-100 shadow-xl rounded-3xl overflow-hidden w-full flex flex-col items-center backface-hidden rotate-y-180 p-8 ${!nft.minted ? "absolute top-0 left-0 opacity-0 pointer-events-none" : "relative"}`}>
+              <div className="w-full flex flex-col items-center text-center">
+                {/* Flex Card */}
+                <div className="w-full bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 rounded-2xl p-1 shadow-md mb-6 card-3d">
+                  <div className="bg-white rounded-xl p-6 flex flex-col items-center relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-100/50 rounded-full blur-3xl -z-10" />
+                    <div className="mx-auto w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-3">
+                      <Check className="h-6 w-6 text-emerald-500" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-stone-900 text-center mb-2">Claimed!</h3>
+                    <p className="text-stone-500 text-sm text-center mb-6">
+                      You are now the official owner.
+                    </p>
+                    
+                    <div className="w-36 h-36 rounded-2xl overflow-hidden shadow-sm border border-stone-100 bg-stone-50 mb-4 flex items-center justify-center">
+                      <img
+                        src={nft.image?.replace("ipfs://", "https://ipfs.io/ipfs/")}
+                        className="w-full h-full object-cover"
+                        alt={nft.name}
+                      />
+                    </div>
+                    
+                    <p className="font-extrabold text-stone-800 text-center text-lg">{nft.name}</p>
+                    <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">
+                      <Sparkles className="w-3 h-3" /> Verified Phygital
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-full space-y-3">
+                  <button 
+                    onClick={() => {
+                      const tweetText = `I just claimed my real-world Phygital asset: ${nft.name}! 🚀\n\nCheck it out here:`;
+                      const url = window.location.href;
+                      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(url)}`, '_blank');
+                    }} 
+                    className="w-full flex items-center justify-center py-4 text-base rounded-2xl bg-[#000000] hover:bg-stone-800 font-bold text-white shadow-md transition-all"
+                  >
+                    <Twitter className="mr-2 h-5 w-5 fill-current" /> Share on X
+                  </button>
+
+                  <Link href="/">
+                    <button className="w-full flex items-center justify-center py-4 text-base rounded-2xl bg-stone-100 hover:bg-stone-200 font-bold text-stone-700 transition-all">
+                      Return to Home
+                    </button>
+                  </Link>
+
+                  {txHash && (
+                    <a
+                      href={`https://sepolia.basescan.org/tx/${txHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block mt-4 text-stone-500 hover:text-indigo-600 font-semibold text-xs transition-colors"
+                    >
+                      View transaction on BaseScan {`->`}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </motion.div>
     </div>
@@ -328,8 +332,8 @@ export default function ClaimPage() {
     <div className="flex flex-col min-h-screen bg-white relative selection:bg-indigo-500/30">
       {/* Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-100/50 blur-[100px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-100/30 blur-[100px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-100/50 blur-[100px] animate-aurora" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-100/40 blur-[100px] animate-aurora2" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50" />
       </div>
 

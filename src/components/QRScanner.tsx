@@ -136,9 +136,6 @@ const QRScanner: React.FC = () => {
           <DialogHeader className="p-6 pb-2">
             <div className="flex items-center justify-between">
               <DialogTitle className="text-2xl font-black text-stone-900 tracking-tight">Scan QR Code</DialogTitle>
-              <button onClick={() => setOpen(false)} className="p-2 hover:bg-stone-50 rounded-full transition-colors">
-                <X className="w-6 h-6 text-stone-400" />
-              </button>
             </div>
           </DialogHeader>
 

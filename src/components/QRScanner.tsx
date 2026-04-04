@@ -1,149 +1,270 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Html5QrcodeScanner } from "html5-qrcode";
-import { Button } from "@/components/ui/button"
+import { Html5Qrcode } from "html5-qrcode";
+import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Camera, 
+  Upload, 
+  X, 
+  RefreshCcw, 
+  Image as ImageIcon,
+  QrCode,
+  Maximize2,
+  ScanLine
+} from "lucide-react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 const QRScanner: React.FC = () => {
-  // Generate a unique ID so multiple QRScanners on the same page don't clash
-  const qrcodeRegionId = useRef(`qr-region-${Math.random().toString(36).substr(2, 9)}`).current;
-  const [open, setOpen] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
   const router = useRouter();
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const [open, setOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'camera' | 'file'>('camera');
+  const [isScanning, setIsScanning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [cameraStatus, setCameraStatus] = useState<'loading' | 'active' | 'error'>('loading');
 
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const qrcodeRegionId = "qr-reader-core";
+
+  // Initialize and handle camera
   useEffect(() => {
-    if (open) {
-      const initializeScanner = () => {
-        if (!scannerRef.current && document.getElementById(qrcodeRegionId)) {
-          scannerRef.current = new Html5QrcodeScanner(
-            qrcodeRegionId,
-            { 
-              fps: 10, 
-              qrbox: { width: 250, height: 250 },
-              aspectRatio: 1,
-            },
-            false
+    if (open && activeTab === 'camera') {
+      const startCamera = async () => {
+        try {
+          if (scannerRef.current) {
+            await scannerRef.current.stop();
+          }
+          
+          const html5QrCode = new Html5Qrcode(qrcodeRegionId);
+          scannerRef.current = html5QrCode;
+          setCameraStatus('loading');
+
+          const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+          
+          await html5QrCode.start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            () => {} // Ignore failures during continuous scan
           );
-          scannerRef.current.render(onScanSuccess, onScanFailure);
+          
+          setCameraStatus('active');
+        } catch (err) {
+          console.error("Camera start error:", err);
+          setCameraStatus('error');
+          setError("Could not access camera. Please check permissions.");
         }
       };
 
-      setTimeout(initializeScanner, 100);
-    }
-
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(error => {
-          console.error("Failed to clear html5QrcodeScanner. ", error);
-        });
-        scannerRef.current = null;
+      // Small delay to ensure the DOM element with qrcodeRegionId is rendered
+      const timer = setTimeout(startCamera, 300);
+      return () => clearTimeout(timer);
+    } else {
+      if (scannerRef.current && scannerRef.current.isScanning) {
+        scannerRef.current.stop().catch(console.error);
       }
-    };
-  }, [open]);
+    }
+  }, [open, activeTab]);
 
-  const onScanSuccess = (decodedText: string, decodedResult: any) => {
-    console.log(`Code matched = ${decodedText}`, decodedResult);
+  const onScanSuccess = (decodedText: string) => {
     setIsScanning(true);
-
-    // If the QR encodes a full URL (e.g. https://yourdomain.com/claim?id=abc123),
-    // navigate directly to the path+query rather than double-wrapping it.
+    // Cleanup first
+    if (scannerRef.current && scannerRef.current.isScanning) {
+      scannerRef.current.stop().catch(console.error);
+    }
+    
+    // Determine path
+    let targetPath = `/claim?id=${encodeURIComponent(decodedText)}`;
     if (decodedText.startsWith("http://") || decodedText.startsWith("https://")) {
       try {
         const url = new URL(decodedText);
-        // Navigate to the path and search params on this app (strips the external domain)
-        router.push(url.pathname + url.search);
-      } catch {
-        router.push(`/claim?id=${encodeURIComponent(decodedText)}`);
-      }
-    } else {
-      // Raw ID or relative path — wrap it normally
-      router.push(`/claim?id=${encodeURIComponent(decodedText)}`);
+        targetPath = url.pathname + url.search;
+      } catch (e) {}
     }
+    
+    setTimeout(() => {
+      router.push(targetPath);
+      setOpen(false);
+      setIsScanning(false);
+    }, 800);
   };
 
-  const onScanFailure = (error: any) => {
-    // console.warn(`Code scan error = ${error}`);
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsScanning(true);
+    setError(null);
+
+    try {
+      const html5QrCode = new Html5Qrcode(qrcodeRegionId);
+      const result = await html5QrCode.scanFile(file, true);
+      onScanSuccess(result);
+    } catch (err) {
+      console.error("File scan error:", err);
+      setError("Could not find a valid QR code in this image.");
+      setIsScanning(false);
+    }
   };
 
   return (
     <>
-      <style>{`
-        #${qrcodeRegionId} {
-          border: none !important;
+      <Button 
+        onClick={() => setOpen(true)} 
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 rounded-2xl shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-3"
+      >
+        <QrCode className="w-5 h-5" />
+        Scan Phygital Asset
+      </Button>
+
+      <Dialog open={open} onOpenChange={(val) => {
+        setOpen(val);
+        if (!val) {
+          setError(null);
+          setIsScanning(false);
         }
-        #${qrcodeRegionId} img {
-          max-width: 100%;
-          border-radius: 12px;
-          margin-bottom: 12px;
-        }
-        #${qrcodeRegionId} button {
-          background-color: #3b3486 !important;
-          color: white !important;
-          border-radius: 8px !important;
-          padding: 10px 16px !important;
-          border: none !important;
-          font-weight: 600 !important;
-          margin: 6px 4px !important;
-          cursor: pointer !important;
-          transition: all 0.2s;
-        }
-        #${qrcodeRegionId} button:hover {
-          background-color: #2e2865 !important;
-        }
-        #${qrcodeRegionId} select {
-          padding: 8px !important;
-          border-radius: 8px !important;
-          border: 1px solid #e5e7eb !important;
-          margin-bottom: 10px !important;
-          width: 100%;
-          max-width: 300px;
-        }
-        #${qrcodeRegionId} a {
-          color: #3b3486 !important;
-          font-weight: 500 !important;
-          text-decoration: none !important;
-        }
-        #${qrcodeRegionId} span {
-          color: #6b7280 !important;
-          font-weight: 500 !important;
-          font-size: 0.9rem !important;
-        }
-        #html5-qrcode-anchor-scan-type-change {
-          text-decoration: none !important;
-          display: inline-block;
-          margin-top: 12px;
-        }
-      `}</style>
-      <Button onClick={() => setOpen(true)} className="w-full">Scan QR Code</Button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[90vw] sm:min-h-[90vh] md:max-w-[500px] md:max-h-[85vh] bg-white overflow-y-auto overflow-x-hidden border-none shadow-2xl rounded-2xl">
-          <DialogHeader className="pb-4 border-b border-stone-100">
-            <DialogTitle className="text-stone-900 text-2xl font-bold">Scan Asset</DialogTitle>
-            <DialogClose className="text-stone-400 hover:text-stone-700" />
+      }}>
+        <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-white border-none shadow-2xl rounded-[32px]">
+          <DialogHeader className="p-6 pb-2">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-black text-stone-900 tracking-tight">Scan QR Code</DialogTitle>
+              <button onClick={() => setOpen(false)} className="p-2 hover:bg-stone-50 rounded-full transition-colors">
+                <X className="w-6 h-6 text-stone-400" />
+              </button>
+            </div>
           </DialogHeader>
-          <div className="flex flex-col items-center justify-center p-4 relative">
-            {/* The QR Scanner region must stay in the DOM to avoid breaking html5-qrcode's stream lifecycle */}
-            <div className="w-full flex flex-col items-center">
-              <div id={qrcodeRegionId} className="w-full max-w-[400px] text-stone-800 rounded-xl overflow-hidden relative">
-                {isScanning && (
-                  <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm rounded-xl">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-200 border-t-indigo-600 mb-4"></div>
-                    <p className="text-sm font-bold text-indigo-900 tracking-wide">AUTHENTICATING...</p>
-                  </div>
+
+          {/* Custom Tabs */}
+          <div className="px-6 flex gap-2 mb-6">
+            <button 
+              onClick={() => setActiveTab('camera')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
+                activeTab === 'camera' 
+                ? "bg-indigo-50 text-indigo-600 border-2 border-indigo-100" 
+                : "bg-stone-50 text-stone-400 hover:bg-stone-100 border-2 border-transparent"
+              }`}
+            >
+              <Camera className="w-4 h-4" /> Camera
+            </button>
+            <button 
+              onClick={() => setActiveTab('file')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
+                activeTab === 'file' 
+                ? "bg-indigo-50 text-indigo-600 border-2 border-indigo-100" 
+                : "bg-stone-50 text-stone-400 hover:bg-stone-100 border-2 border-transparent"
+              }`}
+            >
+              <Upload className="w-4 h-4" /> Upload
+            </button>
+          </div>
+
+          <div className="px-6 pb-8">
+            <div className="relative aspect-square w-full bg-stone-900 rounded-[28px] overflow-hidden group shadow-inner">
+              
+              {/* Scanner Container */}
+              <div id={qrcodeRegionId} className="absolute inset-0 w-full h-full object-cover [&>video]:object-cover [&>video]:w-full [&>video]:h-full" />
+
+              {/* Overlays */}
+              <AnimatePresence>
+                {activeTab === 'camera' && cameraStatus === 'active' && !isScanning && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 z-10 pointer-events-none"
+                  >
+                    {/* Corner Borders */}
+                    <div className="absolute inset-0 border-[40px] border-black/40" />
+                    <div className="absolute top-[10%] left-[10%] w-12 h-12 border-t-4 border-l-4 border-white rounded-tl-2xl shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
+                    <div className="absolute top-[10%] right-[10%] w-12 h-12 border-t-4 border-r-4 border-white rounded-tr-2xl shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
+                    <div className="absolute bottom-[10%] left-[10%] w-12 h-12 border-b-4 border-l-4 border-white rounded-bl-2xl shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
+                    <div className="absolute bottom-[10%] right-[10%] w-12 h-12 border-b-4 border-r-4 border-white rounded-br-2xl shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
+                    
+                    {/* Laser Line Animation */}
+                    <motion.div 
+                      animate={{ top: ["15%", "85%", "15%"] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                      className="absolute left-[15%] right-[15%] h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent shadow-[0_0_10px_rgba(99,102,241,0.8)]"
+                    />
+                  </motion.div>
                 )}
-              </div>
-              <p className="mt-8 text-sm font-medium text-stone-500 text-center">
-                Align the QR code within the frame or upload an image to instantly claim your asset.
-              </p>
+
+                {activeTab === 'file' && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="absolute inset-0 bg-stone-50 z-20 flex flex-col items-center justify-center p-8 text-center"
+                  >
+                    <div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-indigo-100">
+                      <ImageIcon className="w-10 h-10 text-indigo-500" />
+                    </div>
+                    <h4 className="text-xl font-bold text-stone-900 mb-2">Select Image</h4>
+                    <p className="text-stone-500 text-sm mb-8 max-w-[240px]">
+                      Upload a photo of the Phygital asset's QR code from your gallery.
+                    </p>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                      className="hidden" 
+                      accept="image/*"
+                    />
+                    <Button 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 rounded-xl"
+                    >
+                      Browse Gallery
+                    </Button>
+                  </motion.div>
+                )}
+
+                {isScanning && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="absolute inset-0 z-40 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center"
+                  >
+                    <div className="relative">
+                      <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin" />
+                      <ScanLine className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-indigo-600" />
+                    </div>
+                    <p className="mt-4 font-black text-stone-900 tracking-widest text-sm uppercase">Authenticating...</p>
+                  </motion.div>
+                )}
+                
+                {error && activeTab === 'camera' && cameraStatus === 'error' && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="absolute inset-0 z-30 bg-stone-900 flex flex-col items-center justify-center p-8 text-center"
+                  >
+                    <div className="p-4 bg-red-500/20 rounded-full mb-4">
+                      <X className="w-8 h-8 text-red-500" />
+                    </div>
+                    <p className="text-white font-bold mb-6">{error}</p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => window.location.reload()}
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      <RefreshCcw className="w-4 h-4 mr-2" /> Retry
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            <div className="mt-6 flex items-center justify-center gap-2 text-stone-400">
+              <Maximize2 className="w-4 h-4" />
+              <p className="text-xs font-bold uppercase tracking-widest">Secure Verification Tunnel</p>
             </div>
           </div>
         </DialogContent>

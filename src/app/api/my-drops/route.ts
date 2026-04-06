@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ErrorCode, errorResponse } from "@/lib/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,11 @@ export async function GET(request: Request) {
     const address = searchParams.get("address");
 
     if (!address) {
-      return NextResponse.json({ message: "address param required" }, { status: 400 });
+      return errorResponse({
+        code: ErrorCode.VALIDATION,
+        message: "wallet address parameter is required",
+        status: 400,
+      });
     }
 
     const drops = await prisma.nFT.findMany({
@@ -35,10 +40,11 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ drops });
   } catch (error) {
-    console.error("My drops error:", error);
-    return NextResponse.json(
-      { message: "Failed to fetch drops: " + (error instanceof Error ? error.message : String(error)) },
-      { status: 500 }
-    );
+    return errorResponse({
+      code: ErrorCode.INTERNAL,
+      message: "An encrypted server error occurred while fetching your drops",
+      status: 500,
+      details: error,
+    });
   }
 }

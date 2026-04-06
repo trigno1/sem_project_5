@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ErrorCode, errorResponse } from "@/lib/error-handler";
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +10,11 @@ export async function GET(request: Request) {
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ message: "Missing NFT ID" }, { status: 400 });
+      return errorResponse({
+        code: ErrorCode.VALIDATION,
+        message: "Missing NFT ID",
+        status: 400,
+      });
     }
 
     const nft = await prisma.nFT.findUnique({
@@ -17,7 +22,11 @@ export async function GET(request: Request) {
     });
 
     if (!nft) {
-      return NextResponse.json({ message: "NFT not found" }, { status: 404 });
+      return errorResponse({
+        code: ErrorCode.NOT_FOUND,
+        message: "NFT drop not found",
+        status: 404,
+      });
     }
 
     // Increment scansCount asynchronously
@@ -28,7 +37,11 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ nft });
   } catch (error) {
-    console.error("Database or Server Error:", error);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    return errorResponse({
+      code: ErrorCode.INTERNAL,
+      message: "An encrypted server error occurred while fetching the NFT",
+      status: 500,
+      details: error,
+    });
   }
 }

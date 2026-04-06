@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import QRCode from "qrcode";
+import { ErrorCode, errorResponse } from "@/lib/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -23,10 +24,11 @@ export async function POST(request: Request) {
     } = body;
 
     if (!name || !description || !image) {
-      return NextResponse.json(
-        { message: "Missing required fields: name, description, image" },
-        { status: 400 }
-      );
+      return errorResponse({
+        code: ErrorCode.VALIDATION,
+        message: "Missing required fields: name, description, image",
+        status: 400,
+      });
     }
 
     // Create the NFT record in the database
@@ -69,10 +71,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ id: nft.id, qrDataUrl, claimUrl });
   } catch (error) {
-    console.error("Create NFT error:", error);
-    return NextResponse.json(
-      { message: "Failed to create NFT: " + (error instanceof Error ? error.message : String(error)) },
-      { status: 500 }
-    );
+    return errorResponse({
+      code: ErrorCode.INTERNAL,
+      message: "An encrypted server error occurred while creating the NFT",
+      status: 500,
+      details: error,
+    });
   }
 }

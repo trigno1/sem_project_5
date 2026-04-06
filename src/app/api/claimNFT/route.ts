@@ -9,6 +9,7 @@ import {
 import { baseSepolia } from "thirdweb/chains";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { mintTo } from "thirdweb/extensions/erc1155";
+import { ErrorCode, errorResponse } from "@/lib/error-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -18,66 +19,79 @@ export async function POST(request: Request) {
     const { id, address, password } = body;
 
     if (!id || !address) {
-      return NextResponse.json(
-        { error: "Missing required fields: id, address" },
-        { status: 400 }
-      );
+      return errorResponse({
+        code: ErrorCode.VALIDATION,
+        message: "Missing required fields: id, address",
+        status: 400,
+      });
     }
 
     // 1. Fetch the NFT from DB
     const existing = await prisma.nFT.findUnique({ where: { id } });
 
     if (!existing) {
-      return NextResponse.json({ error: "NFT not found" }, { status: 404 });
+      return errorResponse({
+        code: ErrorCode.NOT_FOUND,
+        message: "NFT drop not found",
+        status: 404,
+      });
     }
 
     // 2. Check expiry
     if (existing.expiresAt && new Date() > existing.expiresAt) {
-      return NextResponse.json(
-        { error: "This NFT drop has expired and can no longer be claimed" },
-        { status: 410 }
-      );
+      return errorResponse({
+        code: ErrorCode.EXPIRED,
+        message: "This NFT drop has expired and can no longer be claimed",
+        status: 410,
+      });
     }
 
     // 3. Check if not live yet
     if (existing.issuedAt && new Date() < existing.issuedAt) {
-      return NextResponse.json(
-        { error: `This NFT drop is not live yet. Available from ${existing.issuedAt.toLocaleDateString()}` },
-        { status: 425 }
-      );
+      return errorResponse({
+        code: ErrorCode.VALIDATION,
+        message: `This NFT drop is not live yet. Available from ${existing.issuedAt.toLocaleDateString()}`,
+        status: 425,
+      });
     }
 
     // 4. Password check
     if (existing.password) {
       if (!password) {
-        return NextResponse.json(
-          { error: "This NFT requires a secret code to claim", requiresPassword: true },
-          { status: 403 }
-        );
+        return errorResponse({
+          code: ErrorCode.UNAUTHORIZED,
+          message: "This NFT requires a secret code to claim",
+          status: 403,
+          details: { requiresPassword: true },
+        });
       }
       if (password !== existing.password) {
-        return NextResponse.json(
-          { error: "Incorrect secret code", requiresPassword: true },
-          { status: 403 }
-        );
+        return errorResponse({
+          code: ErrorCode.UNAUTHORIZED,
+          message: "Incorrect secret code",
+          status: 403,
+          details: { requiresPassword: true },
+        });
       }
     }
 
     // 5. Check claim limit
     if (existing.maxClaims !== null) {
       if (existing.claimsCount >= existing.maxClaims) {
-        return NextResponse.json(
-          { error: `This NFT drop is fully claimed (${existing.maxClaims}/${existing.maxClaims})` },
-          { status: 409 }
-        );
+        return errorResponse({
+          code: ErrorCode.LIMIT_REACHED,
+          message: `This NFT drop is fully claimed (${existing.maxClaims}/${existing.maxClaims})`,
+          status: 409,
+        });
       }
     } else {
       // Original single-claim behavior
       if (existing.minted) {
-        return NextResponse.json(
-          { error: "This NFT has already been claimed" },
-          { status: 409 }
-        );
+        return errorResponse({
+          code: ErrorCode.LIMIT_REACHED,
+          message: "This NFT has already been claimed",
+          status: 409,
+        });
       }
     }
 
@@ -145,15 +159,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, nft: updated, txHash });
   } catch (error) {
-    console.error("Claim NFT error:", error);
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Internal server error while minting",
-      },
-      { status: 500 }
-    );
+    return errorResponse({
+      code: ErrorCode.INTERNAL,
+      message: "An encrypted server error occurred",
+      status: 500,
+      details: error,
+    });
   }
 }

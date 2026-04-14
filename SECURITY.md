@@ -15,7 +15,7 @@ We take the security of the Phygital NFT Platform seriously. If you believe you 
 
 **Please do not report security vulnerabilities via public GitHub issues.**
 
-Instead, please send an email to **security-report@example.com** (placeholder).
+Instead, please send an email to **[tanishpareek2005@gmail.com](mailto:tanishpareek2005@gmail.com)**.
 
 ### What to Include
 - A detailed description of the vulnerability.
@@ -32,4 +32,14 @@ Instead, please send an email to **security-report@example.com** (placeholder).
 We ask that you follow responsible disclosure guidelines and give us a reasonable amount of time to fix the issue before making any information public.
 
 ### Smart Contract Security
-Note that this project interacts with the **Base Sepolia Testnet**. While it's a testnet, we still value the security of the integration logic and smart contract interactions. If you find issues related to private key handling or gas optimization vulnerabilities, please include those in your report.
+Note that this project interacts with the **Base Sepolia Testnet**. While it's a testnet, we still value the security of the integration logic and smart contract interactions. If you find issues related to private key handling, signature verification, or gas optimization vulnerabilities, please include those in your report.
+
+### Application Security Measures
+
+The platform implements several hardened security layers:
+
+- **Signature-Based Wallet Authentication** — Sensitive endpoints require cryptographic proof of wallet ownership via `x-signature` and `x-address` headers
+- **Server-Side Input Validation** — All API inputs are validated server-side before processing
+- **Structured Error Handling** — Internal error details are masked from API responses; only standardized error codes (`ERR_API_xxx`, `ERR_AUTH_xxx`, etc.) are exposed
+- **Data Masking** — Sensitive fields like drop passwords are excluded from public API responses
+- **Environment Variable Isolation** — Private keys and secrets live exclusively in server-side environment variables, never exposed to the client bundle

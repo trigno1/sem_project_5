@@ -30,19 +30,13 @@
 
 ## 📸 How It Works
 
-```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│   🎨 CREATOR     │     │   📱 COLLECTOR   │     │   ⛓️ BLOCKCHAIN  │
-│                  │     │                  │     │                  │
-│  Upload image    │     │  Scan QR code    │     │  ERC-1155 mint   │
-│  Set traits      │──▶  │  Login w/ Google │──▶  │  On-chain owner  │
-│  Generate QR     │     │  Tap "Claim"     │     │  Tx on BaseScan  │
-│  Print & share   │     │  NFT in wallet   │     │  Permanent proof │
-└──────────────────┘     └──────────────────┘     └──────────────────┘
-```
+**🎨 Creator** &nbsp;→&nbsp; Upload image, set traits, generate QR, print & share
 
-> **No seed phrases. No gas fees. No app downloads.**  
-> Collectors claim NFTs in under 30 seconds using just a phone camera and a Google/email account.
+**📱 Collector** &nbsp;→&nbsp; Scan QR code, login with Google/email, tap "Claim", NFT in wallet
+
+**⛓️ Blockchain** &nbsp;→&nbsp; ERC-1155 mint, on-chain ownership, verifiable on BaseScan
+
+> **No seed phrases. No gas fees. No app downloads.** Collectors claim NFTs in under 30 seconds using just a phone camera and a Google/email account.
 
 ---
 
@@ -422,25 +416,11 @@ MIT License — Copyright (c) 2026 Tanish Sunita Pareek
 
   ## 👨‍💻 Developed By
 
-  <a href="https://github.com/trigno1">
-    <img src="https://img.shields.io/badge/GitHub-trigno1-181717?style=for-the-badge&logo=github&logoColor=white" />
-  </a>
-  &nbsp;
-  <a href="https://www.linkedin.com/in/tanish-sunita-pareek/">
-    <img src="https://img.shields.io/badge/LinkedIn-Tanish%20Sunita%20Pareek-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
-  </a>
+  **Tanish Sunita Pareek** · *Full-Stack & Web3 Developer*
 
-  <br/><br/>
+  <a href="https://github.com/trigno1"><img src="https://img.shields.io/badge/GitHub-trigno1-181717?style=for-the-badge&logo=github&logoColor=white" /></a>&nbsp;
+  <a href="https://www.linkedin.com/in/tanish-sunita-pareek/"><img src="https://img.shields.io/badge/LinkedIn-Tanish%20Sunita%20Pareek-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
 
-  **Tanish Sunita Pareek**  
-  *Full-Stack & Web3 Developer • Blockchain Builder • Community Lead*
-
-  <br/>
-
-  Built with ❤️ for the Phygital Future
-
-  <br/>
-
-  ⭐ **Star this repo** if you found it useful!
+  Built with ❤️ for the Phygital Future · ⭐ **Star this repo** if you found it useful!
 
 </div>

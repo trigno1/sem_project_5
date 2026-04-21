@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import {
   Wallet, LogOut, CreditCard, QrCode, X, ExternalLink,
   Plus, Copy, Check, ShieldCheck, Lock, Users, Calendar,
-  BarChart2, Sparkles, Activity,
+  BarChart2, Sparkles, Activity, Download, Compass, User,
 } from "lucide-react"
 import {
   AutoConnect, ConnectButton, lightTheme, MediaRenderer,
@@ -53,6 +53,7 @@ export function DashboardComponent() {
   const [myDrops, setMyDrops] = useState<Drop[]>([])
   const [dropsLoading, setDropsLoading] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [qrLoadingId, setQrLoadingId] = useState<string | null>(null)
 
   const { data: ownedNFTs, isLoading: isLoadingOwnedNFTs } = useReadContract(
     getOwnedNFTs,
@@ -93,6 +94,32 @@ export function DashboardComponent() {
     setTimeout(() => setCopiedId(null), 2000)
   }
 
+  const downloadQR = async (drop: Drop) => {
+    if (!account) return
+    setQrLoadingId(drop.id)
+    try {
+      const message = `Authorize Phygital Access for ${account.address}`
+      const signature = await account.signMessage({ message })
+      const res = await fetch(`/api/qr?id=${drop.id}`, {
+        headers: {
+          "x-signature": signature,
+          "x-address": account.address,
+        },
+      })
+      const data = await res.json()
+      if (!res.ok) { toast.error("Failed to regenerate QR"); return }
+      const link = document.createElement("a")
+      link.href = data.qrDataUrl
+      link.download = `phygital-qr-${drop.name.replace(/\s+/g, "-").toLowerCase()}.png`
+      link.click()
+      toast.success("QR downloaded!", { description: `phygital-qr-${drop.name.toLowerCase()}.png` })
+    } catch {
+      toast.error("Could not download QR")
+    } finally {
+      setQrLoadingId(null)
+    }
+  }
+
   const customLightTheme = lightTheme({
     colors: {
       primaryButtonBg: "#3b3486",
@@ -129,6 +156,16 @@ export function DashboardComponent() {
           </Link>
           {account && wallet && (
             <div className="flex items-center gap-3">
+              <Link href="/explore">
+                <Button variant="outline" className="flex items-center text-violet-600 border-violet-200 bg-violet-50 hover:bg-violet-100 hover:border-violet-300 transition-all font-semibold shadow-sm">
+                  <Compass className="sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Explore</span>
+                </Button>
+              </Link>
+              <Link href="/profile">
+                <Button variant="outline" className="flex items-center text-fuchsia-600 border-fuchsia-200 bg-fuchsia-50 hover:bg-fuchsia-100 hover:border-fuchsia-300 transition-all font-semibold shadow-sm">
+                  <User className="sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Profile</span>
+                </Button>
+              </Link>
               <Link href="/create">
                 <Button variant="outline" className="flex items-center text-indigo-600 border-indigo-200 bg-indigo-50 hover:bg-indigo-100 hover:border-indigo-300 transition-all font-semibold shadow-sm">
                   <QrCode className="sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Create QR</span>
@@ -460,6 +497,16 @@ export function DashboardComponent() {
                                 >
                                   <ExternalLink className="h-3.5 w-3.5" /> Preview
                                 </a>
+                                <button
+                                  onClick={() => downloadQR(drop)}
+                                  disabled={qrLoadingId === drop.id}
+                                  className="flex items-center justify-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 py-2 px-3 rounded-xl transition-all disabled:opacity-60"
+                                  title="Re-download QR Code"
+                                >
+                                  {qrLoadingId === drop.id
+                                    ? <span className="animate-spin h-3 w-3 border border-emerald-600 border-t-transparent rounded-full" />
+                                    : <Download className="h-3.5 w-3.5" />}
+                                </button>
                               </div>
                             </div>
                           )

@@ -75,7 +75,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Check claim limit
+    // 5. Check global claim limit
     if (existing.maxClaims !== null) {
       if (existing.claimsCount >= existing.maxClaims) {
         return errorResponse({
@@ -93,6 +93,24 @@ export async function POST(request: Request) {
           status: 409,
         });
       }
+    }
+
+    // 5b. ✅ DUPLICATE CLAIM PREVENTION — Check per-wallet claim record
+    const existingClaim = await prisma.claimRecord.findUnique({
+      where: {
+        dropId_walletAddress: {
+          dropId: id,
+          walletAddress: address.toLowerCase(),
+        },
+      },
+    });
+
+    if (existingClaim) {
+      return errorResponse({
+        code: ErrorCode.LIMIT_REACHED,
+        message: "You have already claimed this NFT with this wallet.",
+        status: 409,
+      });
     }
 
     // 6. Set up Thirdweb client
@@ -146,16 +164,25 @@ export async function POST(request: Request) {
     const isFullyClaimed =
       existing.maxClaims !== null && newClaimsCount >= existing.maxClaims;
 
-    // 9. Update DB
-    const updated = await prisma.nFT.update({
-      where: { id },
-      data: {
-        minted: existing.maxClaims === null ? true : isFullyClaimed,
-        owner: address,
-        txHash,
-        claimsCount: { increment: 1 },
-      },
-    });
+    // 9. Update DB + record claim record atomically
+    const [updated] = await prisma.$transaction([
+      prisma.nFT.update({
+        where: { id },
+        data: {
+          minted: existing.maxClaims === null ? true : isFullyClaimed,
+          owner: address,
+          txHash,
+          claimsCount: { increment: 1 },
+        },
+      }),
+      prisma.claimRecord.create({
+        data: {
+          dropId: id,
+          walletAddress: address.toLowerCase(),
+          txHash,
+        },
+      }),
+    ]);
 
     return NextResponse.json({ success: true, nft: updated, txHash });
   } catch (error) {

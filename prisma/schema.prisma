@@ -30,3 +30,30 @@ model NFT {
   isSoulbound Boolean   @default(false)
   externalUrl String?
 }
+
+model ClaimRecord {
+  id            String   @id @default(cuid()) @map("_id")
+  dropId        String
+  walletAddress String
+  txHash        String?
+  claimedAt     DateTime @default(now())
+
+  @@unique([dropId, walletAddress])
+}
+
+model UserProfile {
+  id        String   @id @default(cuid()) @map("_id")
+  address   String   @unique
+  name      String?
+  bio       String?
+  location  String?
+  phone     String?
+  avatarUrl String?
+  github    String?
+  linkedin  String?
+  instagram String?
+  twitter   String?
+  website   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

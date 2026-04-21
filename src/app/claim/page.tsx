@@ -15,9 +15,11 @@ import {
 
 import { inAppWallet } from "thirdweb/wallets";
 import { client, chain } from "@/app/const/client";
-import { QrCode, ArrowLeft, AlertTriangle, Check, Sparkles, Twitter } from "lucide-react";
+import { QrCode, ArrowLeft, AlertTriangle, Check, Sparkles, Twitter, Mail } from "lucide-react";
 import { Footer } from "@/components/footer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ClaimCertificate } from "@/components/claim-certificate";
+import { toast } from "sonner";
 
 interface NFT {
   id: string;
@@ -54,6 +56,10 @@ function ClaimContent() {
   const [minting, setMinting] = useState(false);
   const [message, setMessage] = useState("");
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [claimedAt, setClaimedAt] = useState<string>("");
+  const [email, setEmail] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   const account = useActiveAccount();
   const { connect } = useConnectModal();
@@ -98,17 +104,54 @@ function ClaimContent() {
 
       const data = await res.json();
       if (res.ok && data.success) {
+        const now = new Date().toISOString();
         setMessage("🎉 NFT successfully minted on-chain!");
         setTxHash(data.txHash || null);
+        setClaimedAt(now);
         setNft({ ...nft, minted: true, owner: account.address });
+
+        // Auto-send email if user provided one
+        if (email.trim()) {
+          sendClaimEmail(data.txHash, now);
+        }
       } else {
-        setMessage(data.error || "Claim failed");
+        const errMsg = data?.error?.message || data?.error || "Claim failed";
+        setMessage(errMsg);
+        toast.error(errMsg);
       }
     } catch (err) {
       console.error("Claim error:", err);
       setMessage("Something went wrong while claiming.");
     } finally {
       setMinting(false);
+    }
+  };
+
+  const sendClaimEmail = async (hash: string, claimed: string) => {
+    if (!email.trim() || !nft || !account?.address) return;
+    setSendingEmail(true);
+    try {
+      const res = await fetch("/api/send-claim-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          nftName: nft.name,
+          nftImage: nft.image,
+          txHash: hash,
+          dropId: nft.id,
+          walletAddress: account.address,
+          claimedAt: claimed,
+        }),
+      });
+      if (res.ok) {
+        setEmailSent(true);
+        toast.success("📧 Receipt sent to your email!");
+      }
+    } catch {
+      // Silent fail — email is optional
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -143,11 +186,9 @@ function ClaimContent() {
   if (loading) {
     return (
       <div className="flex flex-col items-center w-full max-w-md mx-auto px-4">
-        {/* Wallet connect skeleton */}
         <div className="w-full mb-8 flex justify-center">
           <Skeleton className="h-10 w-48 rounded-lg" />
         </div>
-
         <div className="w-full bg-white border border-stone-100 shadow-xl rounded-3xl overflow-hidden flex flex-col">
           <div className="w-full bg-indigo-50/50 border-b border-indigo-100 px-6 py-2.5">
             <Skeleton className="h-3 w-20 rounded" />
@@ -212,7 +253,7 @@ function ClaimContent() {
       >
         <div className="perspective-[1500px]">
           <div className={`relative transition-transform duration-[800ms] preserve-3d w-full ${nft.minted ? "rotate-y-180" : ""}`}>
-            
+
             {/* FRONT OF CARD (Available) */}
             <div className={`bg-white border border-stone-100 shadow-xl rounded-3xl overflow-hidden w-full flex flex-col backface-hidden ${nft.minted ? "absolute top-0 left-0 opacity-0 pointer-events-none" : "relative"}`}>
               {/* Category badge */}
@@ -260,6 +301,26 @@ function ClaimContent() {
                   </div>
                 )}
 
+                {/* ✉️ Optional email input */}
+                {account && (
+                  <div className="mb-5">
+                    <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">
+                      <Mail className="inline h-3 w-3 mr-1 -mt-0.5" />
+                      Email Receipt <span className="text-stone-400 font-normal normal-case">(optional)</span>
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-400 transition-all bg-stone-50"
+                    />
+                    <p className="text-[10px] text-stone-400 mt-1.5 font-medium">
+                      We&apos;ll send you a confirmation with your tx hash — no account needed.
+                    </p>
+                  </div>
+                )}
+
                 {/* Claim button */}
                 <button
                   onClick={account ? handleClaim : handleConnect}
@@ -299,7 +360,7 @@ function ClaimContent() {
                     <p className="text-stone-500 text-sm text-center mb-6">
                       You are now the official owner.
                     </p>
-                    
+
                     <div className="w-36 h-36 rounded-2xl overflow-hidden shadow-sm border border-stone-100 bg-stone-50 mb-4 flex items-center justify-center">
                       <img
                         src={nft.image?.replace("ipfs://", "https://ipfs.io/ipfs/")}
@@ -307,7 +368,7 @@ function ClaimContent() {
                         alt={nft.name}
                       />
                     </div>
-                    
+
                     <p className="font-extrabold text-stone-800 text-center text-lg">{nft.name}</p>
                     <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">
                       <Sparkles className="w-3 h-3" /> Verified Phygital
@@ -316,12 +377,45 @@ function ClaimContent() {
                 </div>
 
                 <div className="w-full space-y-3">
-                  <button 
+                  {/* 🏅 Certificate Download */}
+                  {txHash && (
+                    <ClaimCertificate
+                      nftName={nft.name}
+                      nftDescription={nft.description}
+                      nftImage={nft.image}
+                      walletAddress={account?.address ?? ""}
+                      txHash={txHash}
+                      dropId={nft.id}
+                      claimedAt={claimedAt}
+                    />
+                  )}
+
+                  {/* ✉️ Email sent confirmation */}
+                  {emailSent && (
+                    <div className="flex items-center justify-center gap-2 text-sm font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 py-3 px-4 rounded-2xl">
+                      <Check className="h-4 w-4" />
+                      Receipt sent to {email}
+                    </div>
+                  )}
+
+                  {/* Send email button if email entered but not yet sent */}
+                  {!emailSent && email && txHash && (
+                    <button
+                      onClick={() => sendClaimEmail(txHash, claimedAt)}
+                      disabled={sendingEmail}
+                      className="w-full flex items-center justify-center gap-2 py-3 text-sm rounded-2xl bg-stone-100 hover:bg-stone-200 font-bold text-stone-700 transition-all border border-stone-200"
+                    >
+                      <Mail className="h-4 w-4" />
+                      {sendingEmail ? "Sending…" : "Send Email Receipt"}
+                    </button>
+                  )}
+
+                  <button
                     onClick={() => {
                       const tweetText = `I just claimed my real-world Phygital asset: ${nft.name}! 🚀\n\nCheck it out here:`;
                       const url = window.location.href;
                       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(url)}`, '_blank');
-                    }} 
+                    }}
                     className="w-full flex items-center justify-center py-4 text-base rounded-2xl bg-[#000000] hover:bg-stone-800 font-bold text-white shadow-md transition-all"
                   >
                     <Twitter className="mr-2 h-5 w-5 fill-current" /> Share on X

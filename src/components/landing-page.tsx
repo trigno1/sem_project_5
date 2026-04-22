@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActiveAccount, useActiveWallet, useConnectModal, useDisconnect, AutoConnect, lightTheme } from "thirdweb/react";
+import { useActiveAccount, useActiveWallet, useConnectModal, useDisconnect, AutoConnect, darkTheme } from "thirdweb/react";
 import { inAppWallet, createWallet } from "thirdweb/wallets";
 import { client, chain } from "@/app/const/client";
 import { motion } from "framer-motion";
@@ -11,12 +11,17 @@ import { Hexagon, Zap, Globe, Timer, Search, Shield, Mail, FileText, LayoutGrid,
 
 const phygitalLogo = "/phygital_ultra_logo.png";
 
-const indigoTheme = lightTheme({
+const indigoTheme = darkTheme({
   colors: {
-    primaryButtonBg: "#4f46e5",
+    primaryButtonBg: "#6366f1",
     primaryButtonText: "#ffffff",
-    modalBg: "#0c0c1d",
-    borderColor: "#474659",
+    modalBg: "#0f0f23",
+    borderColor: "#2e2e52",
+    separatorLine: "#252547",
+    secondaryText: "#a5a5c0",
+    accentText: "#818cf8",
+    accentButtonBg: "#6366f1",
+    accentButtonText: "#ffffff",
   },
 });
 
@@ -80,7 +85,7 @@ function NavBar({ account, wallet, disconnect, handleConnect, scroll }: any) {
           <div className="relative w-11 h-11 transition-transform duration-500 group-hover:scale-110">
             <img src={phygitalLogo} alt="Phygital Logo" className="w-full h-full object-contain" />
           </div>
-          <span className={`text-2xl font-black tracking-tighter transition-colors ${isScrolled ? "text-black" : "text-black"}`}>Phygital</span>
+          <span className="text-2xl font-black tracking-tighter transition-colors text-black">Phygital</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
@@ -98,7 +103,7 @@ function NavBar({ account, wallet, disconnect, handleConnect, scroll }: any) {
 
         <div className="flex items-center gap-4">
           {account ? (
-            <button onClick={() => disconnect(wallet!)}
+            <button onClick={() => { if (wallet) disconnect(wallet); }}
               className="px-6 py-2.5 text-sm font-bold text-black/40 hover:text-red-500 transition-colors border border-black/5 rounded-xl">
               Sign Out
             </button>
@@ -504,22 +509,22 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
 
     const imgData = oc.getImageData(0, 0, W, H).data;
     const targets: { x: number; y: number }[] = [];
-    // Increase density for "Complete Text" feel
-    for (let y = 0; y < H; y += 3) {
-      for (let x = 0; x < W; x += 3) {
-        if (imgData[(y * W + x) * 4 + 3] > 120) targets.push({ x, y });
+    // Dense sampling for solid text appearance
+    for (let y = 0; y < H; y += 2) {
+      for (let x = 0; x < W; x += 2) {
+        if (imgData[(y * W + x) * 4 + 3] > 100) targets.push({ x, y });
       }
     }
-    const MAX = 3500; // Much higher density
+    const MAX = 12000;
     const sampled = targets.length > MAX
       ? targets.filter((_, i) => i % Math.ceil(targets.length / MAX) === 0)
       : targets;
 
     const particles = sampled.map(t => ({
-      x: Math.random() * W, y: Math.random() * H + H, // Start from bottom
+      x: Math.random() * W, y: Math.random() * H + H,
       tx: t.x, ty: t.y, 
-      r: Math.random() * 1.8 + 1, // Slightly larger particles
-      color: `hsla(${240 + Math.random() * 60}, 100%, 75%, ${0.5 + Math.random() * 0.5})`
+      s: Math.random() * 1.2 + 1.5, // Small square size for tight packing
+      color: `hsla(${240 + Math.random() * 60}, 100%, ${65 + Math.random() * 20}%, ${0.7 + Math.random() * 0.3})`
     }));
 
     let frame = 0;
@@ -528,13 +533,10 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
       ctx.clearRect(0, 0, W, H);
       frame = Math.min(frame + 1, FRAMES);
       particles.forEach(p => {
-        // Dynamic easing for snappy assembly
         p.x += (p.tx - p.x) * 0.08;
         p.y += (p.ty - p.y) * 0.08;
         ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s);
       });
       if (frame < FRAMES || particles.some(p => Math.abs(p.x - p.tx) > 0.5)) {
         animRef.current = requestAnimationFrame(draw);

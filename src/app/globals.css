@@ -204,3 +204,144 @@
 .animate-fade-in-up   { animation: fade-in-up   0.7s ease both; }
 .animate-pulse-ring   { animation: pulse-ring   2.5s cubic-bezier(0.455,0.03,0.515,0.955) infinite; }
 
+/* ── Splash Screen ─────────────────────────────────── */
+
+/* Logo entrance: scale up + fade in with bounce */
+.splash-logo-enter {
+  animation: splash-logo-enter 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+@keyframes splash-logo-enter {
+  from { opacity: 0; transform: scale(0.3) translateY(20px); filter: blur(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+
+/* Logo gentle float */
+.splash-logo-float {
+  animation: splash-logo-float 4s ease-in-out infinite 1.2s;
+}
+@keyframes splash-logo-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+
+/* Rotating ring around logo */
+.splash-ring-rotate {
+  animation: splash-ring-rotate 8s linear infinite;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(99, 102, 241, 0.15) 25%, transparent 50%, rgba(139, 92, 246, 0.1) 75%, transparent 100%);
+}
+@keyframes splash-ring-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Shimmer sweep across logo */
+.splash-shimmer-sweep {
+  animation: splash-shimmer-sweep 2.5s ease-in-out infinite 1s;
+}
+@keyframes splash-shimmer-sweep {
+  0%   { transform: translateX(-100%); }
+  40%  { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Text entrance: slide up + fade */
+.splash-text-enter {
+  animation: splash-text-enter 0.7s ease 0.6s both;
+}
+@keyframes splash-text-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress bar entrance */
+.splash-bar-enter {
+  animation: splash-bar-enter 0.5s ease 1s both;
+}
+@keyframes splash-bar-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Gradient shift for progress bar fill */
+@keyframes splash-gradient-shift {
+  0%   { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Status dot pulse */
+.splash-dot-pulse {
+  animation: splash-dot-pulse 1.2s ease-in-out infinite;
+}
+@keyframes splash-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 4px rgba(52, 211, 153, 0.6); }
+  50%      { opacity: 0.3; transform: scale(0.6); box-shadow: 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+/* Glow pulses */
+.splash-glow-pulse {
+  animation: splash-glow-pulse 3s ease-in-out infinite;
+}
+@keyframes splash-glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.25); }
+}
+
+.splash-glow-pulse-alt {
+  animation: splash-glow-pulse-alt 3.5s ease-in-out infinite 0.8s;
+}
+@keyframes splash-glow-pulse-alt {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.35); }
+}
+
+/* Orbit ring pulse */
+.splash-orbit-pulse {
+  animation: splash-orbit-pulse 3.5s ease-in-out infinite;
+}
+@keyframes splash-orbit-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.04; }
+  50%      { transform: scale(1.08); opacity: 0.1; }
+}
+
+/* Particles — responsive drift range */
+.splash-particle {
+  position: absolute;
+  background: rgba(129, 140, 248, 0.4);
+  border-radius: 50%;
+  animation: splash-particle-drift ease-in-out infinite;
+}
+@keyframes splash-particle-drift {
+  0%       { opacity: 0; transform: translateY(0) scale(0.4); }
+  15%      { opacity: 0.8; }
+  85%      { opacity: 0.3; }
+  100%     { opacity: 0; transform: translateY(-80px) scale(0); }
+}
+
+/* Aurora blobs — responsive with clamp */
+.splash-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(clamp(60px, 12vw, 120px));
+}
+.splash-blob-1 {
+  width: clamp(200px, 40vw, 500px);
+  height: clamp(200px, 40vw, 500px);
+  top: -10%; left: -5%;
+  background: rgba(79, 70, 229, 0.18);
+  animation: aurora 10s ease-in-out infinite;
+}
+.splash-blob-2 {
+  width: clamp(180px, 35vw, 450px);
+  height: clamp(180px, 35vw, 450px);
+  bottom: -5%; right: -5%;
+  background: rgba(124, 58, 237, 0.14);
+  animation: aurora2 12s ease-in-out infinite;
+}
+.splash-blob-3 {
+  width: clamp(120px, 25vw, 350px);
+  height: clamp(120px, 25vw, 350px);
+  top: 30%; right: 20%;
+  background: rgba(99, 102, 241, 0.1);
+  animation: aurora 14s ease-in-out infinite 2s;
+}
+

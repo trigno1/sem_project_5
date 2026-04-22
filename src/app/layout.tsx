@@ -37,6 +37,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { SplashScreen } from "@/components/splash-screen";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -51,6 +53,7 @@ export default function RootLayout({
           defaultTheme="dark"
           disableTransitionOnChange
         >
+          <SplashScreen />
           {/* ✅ Wrap everything inside ThirdwebProviderWrapper */}
           <ThirdwebProviderWrapper>{children}</ThirdwebProviderWrapper>
           <Toaster position="bottom-right" richColors closeButton />

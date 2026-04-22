@@ -28,6 +28,7 @@ model NFT {
   scansCount  Int       @default(0)
   password    String?
   isSoulbound Boolean   @default(false)
+  isPublic    Boolean   @default(false)
   externalUrl String?
 }
 

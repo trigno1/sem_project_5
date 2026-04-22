@@ -7,7 +7,7 @@ import {
   QrCode, Sparkles, PartyPopper, Calendar, ArrowLeft, ArrowRight,
   Download, CheckCircle2, Tag, Plus, Trash2, Upload, Lock,
   ShieldCheck, Globe, Users, Image as ImageIcon, Eye, EyeOff,
-  ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp, Compass,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -30,6 +30,7 @@ interface FormData {
   maxClaims: string;        // "" = single-claim
   password: string;
   isSoulbound: boolean;
+  isPublic: boolean;
   externalUrl: string;
 }
 
@@ -71,7 +72,7 @@ export default function CreatePage() {
     name: "", description: "", imageUrl: "", imageFile: null,
     imagePreview: "", issuedAt: "", expiresAt: "", otherPurpose: "",
     attributes: [{ key: "", value: "" }],
-    maxClaims: "", password: "", isSoulbound: false, externalUrl: "",
+    maxClaims: "", password: "", isSoulbound: false, isPublic: false, externalUrl: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -176,6 +177,7 @@ export default function CreatePage() {
           maxClaims: form.maxClaims ? parseInt(form.maxClaims, 10) : undefined,
           password: form.password || undefined,
           isSoulbound: form.isSoulbound,
+          isPublic: form.isPublic,
           externalUrl: form.externalUrl || undefined,
           creatorAddress: account.address,
         }),
@@ -209,7 +211,7 @@ export default function CreatePage() {
     setStep(1); setPurpose(null); setResult(null); setError("");
     setForm({ name: "", description: "", imageUrl: "", imageFile: null, imagePreview: "",
       issuedAt: "", expiresAt: "", otherPurpose: "", attributes: [{ key: "", value: "" }],
-      maxClaims: "", password: "", isSoulbound: false, externalUrl: "" });
+      maxClaims: "", password: "", isSoulbound: false, isPublic: false, externalUrl: "" });
   };
 
   return (
@@ -227,7 +229,7 @@ export default function CreatePage() {
             <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Back to Dashboard</span>
           </Link>
           <div className="flex items-center gap-2 text-stone-900 font-bold text-lg">
-            <Image src="/logo.png" alt="Phygital Logo" width={24} height={24} className="rounded" /> Create Drop
+            <Image src="/logo.png" alt="Phygital Logo" width={24} height={24} className="object-contain" /> Create Drop
           </div>
           {/* Step indicator */}
           <div className="hidden sm:flex items-center gap-1.5 bg-stone-50 border border-stone-200 p-1.5 rounded-full shadow-inner">
@@ -516,7 +518,7 @@ export default function CreatePage() {
                   className="w-full flex items-center justify-between px-5 py-4 bg-stone-50 hover:bg-stone-100 transition-colors">
                   <span className="text-sm font-bold text-stone-700 flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-indigo-500" /> Advanced Options
-                    <span className="text-xs font-normal text-stone-400">— claim limit, password, soulbound</span>
+                    <span className="text-xs font-normal text-stone-400">— claim limit, password, soulbound, visibility</span>
                   </span>
                   {showAdvanced ? <ChevronUp className="h-4 w-4 text-stone-400" /> : <ChevronDown className="h-4 w-4 text-stone-400" />}
                 </button>
@@ -585,6 +587,24 @@ export default function CreatePage() {
                         </p>
                       </div>
                     </div>
+
+                    {/* Public Explore Toggle */}
+                    <div className="flex items-start gap-4">
+                      <button type="button"
+                        onClick={() => setForm({ ...form, isPublic: !form.isPublic })}
+                        className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors ${form.isPublic ? "bg-emerald-500" : "bg-stone-200"}`}
+                      >
+                        <span className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${form.isPublic ? "translate-x-5" : "translate-x-0"}`} />
+                      </button>
+                      <div>
+                        <p className="text-sm font-semibold text-stone-700 flex items-center gap-2">
+                          <Compass className="h-4 w-4 text-emerald-500" /> Show on Explore Page
+                        </p>
+                        <p className="text-xs text-stone-400 mt-0.5">
+                          When enabled, this drop will be publicly visible on the Explore page for anyone to discover and claim. Otherwise it stays private — only people with the QR code or direct link can access it.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -644,6 +664,15 @@ export default function CreatePage() {
               {form.expiresAt && (
                 <span className="bg-stone-50 border border-stone-200 text-stone-600 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
                   <Calendar className="h-3 w-3" /> Expires {new Date(form.expiresAt).toLocaleDateString()}
+                </span>
+              )}
+              {form.isPublic ? (
+                <span className="bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+                  <Compass className="h-3 w-3" /> Public on Explore
+                </span>
+              ) : (
+                <span className="bg-stone-50 border border-stone-200 text-stone-500 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+                  <EyeOff className="h-3 w-3" /> Private (QR only)
                 </span>
               )}
             </div>

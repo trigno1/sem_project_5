@@ -20,6 +20,7 @@ export async function POST(request: Request) {
       maxClaims,
       password,
       isSoulbound,
+      isPublic,
       externalUrl,
       creatorAddress,
     } = body;
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
         maxClaims: maxClaims ? parseInt(maxClaims, 10) : null,
         password: password || null,
         isSoulbound: isSoulbound ?? false,
+        isPublic: isPublic ?? false,
         externalUrl: externalUrl || null,
         creatorAddress: creatorAddress || null,
         minted: false,

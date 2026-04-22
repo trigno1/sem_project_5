@@ -5,8 +5,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/explore
- * Public endpoint — returns active, public (no-password) NFT drops.
- * Filters: not expired, not fully claimed, already live, no password gate.
+ * Public endpoint — returns active NFT drops that creators chose to display publicly.
+ * Only drops with isPublic=true are shown. Also filters: not expired, not fully claimed, already live.
  */
 export async function GET() {
   try {
@@ -14,7 +14,7 @@ export async function GET() {
 
     const drops = await prisma.nFT.findMany({
       where: {
-        password: null,           // public only
+        isPublic: true,           // only creator-approved public drops
         OR: [
           { expiresAt: null },
           { expiresAt: { gt: now } },

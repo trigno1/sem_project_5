@@ -252,7 +252,7 @@ function ClaimContent() {
         className="w-full relative"
       >
         <div className="perspective-[1500px]">
-          <div className={`relative transition-transform duration-[800ms] preserve-3d w-full ${nft.minted ? "rotate-y-180" : ""}`}>
+          <div className={`relative transition-transform duration-700 preserve-3d w-full ${nft.minted ? "rotate-y-180" : ""}`}>
 
             {/* FRONT OF CARD (Available) */}
             <div className={`bg-white border border-stone-100 shadow-xl rounded-3xl overflow-hidden w-full flex flex-col backface-hidden ${nft.minted ? "absolute top-0 left-0 opacity-0 pointer-events-none" : "relative"}`}>

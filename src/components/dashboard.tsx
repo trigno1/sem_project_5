@@ -44,7 +44,11 @@ interface Drop {
   createdAt: string
 }
 
+import { useLanguage } from "@/lib/i18n/LanguageContext"
+import { LanguageSwitcher } from "@/lib/i18n/LanguageSwitcher"
+
 export function DashboardComponent() {
+  const { t } = useLanguage()
   const account = useActiveAccount()
   const status = useActiveWalletConnectionStatus()
   const { disconnect } = useDisconnect()
@@ -91,7 +95,7 @@ export function DashboardComponent() {
     const url = `${window.location.origin}/claim?id=${id}`
     await navigator.clipboard.writeText(url)
     setCopiedId(id)
-    toast.success("Claim link copied!", { description: "Share it anywhere — no QR needed." })
+    toast.success(t("dash.copied"), { description: "Share it anywhere — no QR needed." })
     setTimeout(() => setCopiedId(null), 2000)
   }
 
@@ -132,9 +136,9 @@ export function DashboardComponent() {
 
   const getDropStatus = (drop: Drop) => {
     const now = new Date()
-    if (drop.expiresAt && new Date(drop.expiresAt) < now) return { label: "Expired", color: "text-red-600 bg-red-50 border-red-200" }
-    if (drop.maxClaims && drop.claimsCount >= drop.maxClaims) return { label: "Sold Out", color: "text-amber-600 bg-amber-50 border-amber-200" }
-    return { label: "Active", color: "text-emerald-600 bg-emerald-50 border-emerald-200" }
+    if (drop.expiresAt && new Date(drop.expiresAt) < now) return { label: t("dash.expired"), color: "text-red-600 bg-red-50 border-red-200" }
+    if (drop.maxClaims && drop.claimsCount >= drop.maxClaims) return { label: t("dash.soldOut"), color: "text-amber-600 bg-amber-50 border-amber-200" }
+    return { label: t("dash.active"), color: "text-emerald-600 bg-emerald-50 border-emerald-200" }
   }
 
   return (
@@ -157,29 +161,32 @@ export function DashboardComponent() {
             </div>
             <span className="text-2xl font-black text-black tracking-tighter">Phygital</span>
           </Link>
-          {account && wallet && (
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Link href="/explore">
-                <button className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black/60 hover:text-black bg-black/[0.04] hover:bg-black/[0.08] rounded-full transition-all">
-                  <Compass className="h-4 w-4" /> <span className="hidden sm:inline">Explore</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageSwitcher />
+            {account && wallet && (
+              <>
+                <Link href="/explore">
+                  <button className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black/60 hover:text-black bg-black/[0.04] hover:bg-black/[0.08] rounded-full transition-all">
+                    <Compass className="h-4 w-4" /> <span className="hidden sm:inline">{t("nav.explore")}</span>
+                  </button>
+                </Link>
+                <Link href="/profile">
+                  <button className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black/60 hover:text-black bg-black/[0.04] hover:bg-black/[0.08] rounded-full transition-all">
+                    <User className="h-4 w-4" /> <span className="hidden sm:inline">{t("nav.profile")}</span>
+                  </button>
+                </Link>
+                <Link href="/create">
+                  <button className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black/60 hover:text-black bg-black/[0.04] hover:bg-black/[0.08] rounded-full transition-all">
+                    <QrCode className="h-4 w-4" /> <span className="hidden sm:inline">{t("nav.create")}</span>
+                  </button>
+                </Link>
+                <button onClick={() => { if (wallet) disconnect(wallet); toast.success("Signed out successfully") }}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black/40 hover:text-red-500 hover:bg-red-50 rounded-full transition-all border border-transparent hover:border-red-100">
+                  <LogOut className="h-4 w-4" /> <span className="hidden sm:inline">{t("nav.signOut")}</span>
                 </button>
-              </Link>
-              <Link href="/profile">
-                <button className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black/60 hover:text-black bg-black/[0.04] hover:bg-black/[0.08] rounded-full transition-all">
-                  <User className="h-4 w-4" /> <span className="hidden sm:inline">Profile</span>
-                </button>
-              </Link>
-              <Link href="/create">
-                <button className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black/60 hover:text-black bg-black/[0.04] hover:bg-black/[0.08] rounded-full transition-all">
-                  <QrCode className="h-4 w-4" /> <span className="hidden sm:inline">Create</span>
-                </button>
-              </Link>
-              <button onClick={() => { if (wallet) disconnect(wallet); toast.success("Signed out successfully") }}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-black/40 hover:text-red-500 hover:bg-red-50 rounded-full transition-all border border-transparent hover:border-red-100">
-                <LogOut className="h-4 w-4" /> <span className="hidden sm:inline">Sign Out</span>
-              </button>
-            </div>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </header>
 
@@ -197,15 +204,15 @@ export function DashboardComponent() {
               >
                 <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-black/5 border border-black/5 mb-6">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
-                  <span className="text-[10px] font-black text-black/50 uppercase tracking-[0.2em]">Base Sepolia Network</span>
+                  <span className="text-[10px] font-black text-black/50 uppercase tracking-[0.2em]">{t("dash.network")}</span>
                 </div>
                 <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-black tracking-[-0.04em] leading-[1.05]">
-                  Welcome back,{" "}
+                  {t("dash.welcome")},{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-orange-500 font-mono tracking-normal text-3xl sm:text-4xl lg:text-5xl">
                     {account.address.slice(0, 6)}...{account.address.slice(-4)}
                   </span>
                 </h2>
-                <p className="text-black/40 mt-3 font-medium text-lg sm:text-xl max-w-2xl">Here's an overview of your Phygital assets.</p>
+                <p className="text-black/40 mt-3 font-medium text-lg sm:text-xl max-w-2xl">{t("dash.subtitle")}</p>
               </motion.div>
 
               {/* Stats row */}
@@ -217,7 +224,7 @@ export function DashboardComponent() {
               >
                 {/* Wallet card */}
                 <div className="col-span-1 md:col-span-2 lg:col-span-2 bg-white border border-black/5 rounded-[28px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] p-6 sm:p-8">
-                  <span className="text-[10px] font-black text-black/30 uppercase tracking-[0.2em]">Connected Wallet</span>
+                  <span className="text-[10px] font-black text-black/30 uppercase tracking-[0.2em]">{t("dash.wallet")}</span>
                   <div className="mt-4">
                     <ConnectButton client={client} theme={customLightTheme} chain={chain} />
                   </div>
@@ -231,7 +238,7 @@ export function DashboardComponent() {
                       <div className="flex items-center justify-center bg-black/5 w-11 h-11 rounded-2xl mb-4">
                         <Wallet className="h-5 w-5 text-black/70" />
                       </div>
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-wider">Collected</span>
+                      <span className="text-xs font-bold text-black/40 uppercase tracking-wider">{t("dash.collected")}</span>
                       <div className="text-5xl font-black text-black tracking-tight mt-1">{ownedNFTs?.length ?? 0}</div>
                     </div>
                   </div>
@@ -243,7 +250,7 @@ export function DashboardComponent() {
                       <div className="flex items-center justify-center bg-black/5 w-11 h-11 rounded-2xl mb-4">
                         <Activity className="h-5 w-5 text-black/70" />
                       </div>
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-wider">Drops</span>
+                      <span className="text-xs font-bold text-black/40 uppercase tracking-wider">{t("dash.drops")}</span>
                       <div className="text-5xl font-black text-black tracking-tight mt-1">{myDrops.length}</div>
                     </div>
                   </div>
@@ -262,10 +269,10 @@ export function DashboardComponent() {
                         
                         <div className="relative z-10 w-full mt-auto">
                           <h3 className="text-white font-black text-xl tracking-tight leading-tight mb-1 group-hover:translate-x-1 transition-transform uppercase">
-                            Scan Asset
+                            {t("dash.scanAsset")}
                           </h3>
                           <div className="flex items-center justify-between w-full">
-                            <span className="text-white/50 text-[9px] font-black uppercase tracking-[0.2em]">Instant Auth</span>
+                            <span className="text-white/50 text-[9px] font-black uppercase tracking-[0.2em]">{t("dash.instantAuth")}</span>
                             <div className="h-1 w-8 bg-white/20 rounded-full overflow-hidden">
                               <div className="h-full bg-white w-1/3 animate-shimmer" />
                             </div>
@@ -290,8 +297,8 @@ export function DashboardComponent() {
               >
                 <div className="flex items-center gap-2 mb-8">
                   {([
-                    { id: "collected" as Tab, label: "My Collection", icon: Wallet },
-                    { id: "drops" as Tab, label: "My Drops", icon: BarChart2 },
+                    { id: "collected" as Tab, label: t("dash.myCollection"), icon: Wallet },
+                    { id: "drops" as Tab, label: t("dash.myDrops"), icon: BarChart2 },
                   ] as { id: Tab; label: string; icon: React.ElementType }[]).map((tab) => (
                     <button
                       key={tab.id}
@@ -353,9 +360,9 @@ export function DashboardComponent() {
                           <div className="bg-black/5 p-5 rounded-2xl mb-6 relative">
                             <Wallet className="h-10 w-10 text-black/70 relative z-10" />
                           </div>
-                          <h3 className="text-3xl sm:text-4xl font-black text-black mb-3 tracking-[-0.03em]">Build your collection</h3>
+                          <h3 className="text-3xl sm:text-4xl font-black text-black mb-3 tracking-[-0.03em]">{t("dash.buildCollection")}</h3>
                           <p className="text-base text-black/40 text-center max-w-md mb-8 leading-relaxed font-medium">
-                            Your smart wallet is empty. Scan a physical Phygital QR code to instantly mint a digital asset.
+                            {t("dash.emptyWallet")}
                           </p>
                           <div className="w-full max-w-sm px-4">
                             <QRScanner trigger={
@@ -364,8 +371,8 @@ export function DashboardComponent() {
                                   <QrCode className="h-5 w-5 text-white" />
                                 </div>
                                 <div className="text-left relative z-10">
-                                  <h3 className="text-white font-black text-sm tracking-tight uppercase">Launch Scanner</h3>
-                                  <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em]">Connect Physical Asset</p>
+                                  <h3 className="text-white font-black text-sm tracking-tight uppercase">{t("dash.launchScanner")}</h3>
+                                  <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em]">{t("dash.connectPhysical")}</p>
                                 </div>
                                 <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
                               </div>
@@ -421,13 +428,13 @@ export function DashboardComponent() {
                         <div className="bg-black/5 p-5 rounded-2xl mb-6">
                           <Sparkles className="h-10 w-10 text-black/70" />
                         </div>
-                        <h3 className="text-3xl sm:text-4xl font-black text-black mb-3 tracking-[-0.03em]">No drops yet</h3>
+                        <h3 className="text-3xl sm:text-4xl font-black text-black mb-3 tracking-[-0.03em]">{t("dash.noDrops")}</h3>
                         <p className="text-base text-black/40 max-w-md mb-8 leading-relaxed font-medium">
-                          Create your first NFT drop and distribute it as a QR code anywhere in the physical world.
+                          {t("dash.noDropsDesc")}
                         </p>
                         <Link href="/create">
                           <button className="group relative px-8 py-4 bg-black text-white font-black rounded-[20px] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(0,0,0,0.2)] flex items-center gap-2 uppercase tracking-widest text-sm">
-                            <Plus className="h-4 w-4" /> Create Your First Drop
+                            <Plus className="h-4 w-4" /> {t("dash.createFirst")}
                           </button>
                         </Link>
                       </div>
@@ -467,11 +474,11 @@ export function DashboardComponent() {
                               <div className="space-y-3">
                                 <div className="grid grid-cols-3 gap-2 text-center">
                                   <div className="bg-black/[0.03] rounded-xl py-2.5 border border-black/5">
-                                    <p className="text-[9px] uppercase font-black text-black/30 mb-0.5 tracking-wider">Scans</p>
+                                    <p className="text-[9px] uppercase font-black text-black/30 mb-0.5 tracking-wider">{t("dash.scans")}</p>
                                     <p className="text-sm font-black text-black">{drop.scansCount || 0}</p>
                                   </div>
                                   <div className="bg-black/[0.03] rounded-xl py-2.5 border border-black/5">
-                                    <p className="text-[9px] uppercase font-black text-black/30 mb-0.5 tracking-wider">Claims</p>
+                                    <p className="text-[9px] uppercase font-black text-black/30 mb-0.5 tracking-wider">{t("dash.claims")}</p>
                                     <p className="text-sm font-black text-black">{drop.claimsCount}{drop.maxClaims ? `/${drop.maxClaims}` : ""}</p>
                                   </div>
                                   <div className="bg-black/[0.03] rounded-xl py-2.5 border border-black/5">
@@ -500,7 +507,7 @@ export function DashboardComponent() {
                                 )}
                                 {drop.password && (
                                   <span className="flex items-center gap-1 text-[10px] font-black text-black/50 bg-black/[0.03] border border-black/5 px-2 py-0.5 rounded-full">
-                                    <Lock className="h-2.5 w-2.5" /> Gated
+                                    <Lock className="h-2.5 w-2.5" /> {t("dash.gated")}
                                   </span>
                                 )}
                                 {drop.category && (
@@ -522,7 +529,7 @@ export function DashboardComponent() {
                                   className="flex-1 flex items-center justify-center gap-1.5 text-xs font-black text-black/60 bg-black/[0.03] hover:bg-black/[0.07] border border-black/5 py-2.5 rounded-[14px] transition-all"
                                 >
                                   {copiedId === drop.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                                  {copiedId === drop.id ? "Copied!" : "Copy Link"}
+                                  {copiedId === drop.id ? t("dash.copied") : t("dash.copyLink")}
                                 </button>
                                 <a
                                   href={`/claim?id=${drop.id}`}
@@ -530,7 +537,7 @@ export function DashboardComponent() {
                                   rel="noopener noreferrer"
                                   className="flex-1 flex items-center justify-center gap-1.5 text-xs font-black text-black/60 bg-black/[0.03] hover:bg-black/[0.07] border border-black/5 py-2.5 rounded-[14px] transition-all"
                                 >
-                                  <ExternalLink className="h-3.5 w-3.5" /> Preview
+                                  <ExternalLink className="h-3.5 w-3.5" /> {t("dash.preview")}
                                 </a>
                                 <button
                                   onClick={() => downloadQR(drop)}
@@ -560,7 +567,7 @@ export function DashboardComponent() {
                     <div className="absolute inset-0 rounded-full border-2 border-black/5" />
                     <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-black animate-spin" />
                   </div>
-                  <p className="text-black/40 font-bold text-sm uppercase tracking-[0.2em]">Authenticating</p>
+                  <p className="text-black/40 font-bold text-sm uppercase tracking-[0.2em]">{t("dash.authenticating")}</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center text-center bg-white p-12 sm:p-16 rounded-[28px] border border-black/5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] max-w-lg mx-auto">
@@ -571,7 +578,7 @@ export function DashboardComponent() {
                     Welcome{" "}
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-orange-500">Back</span>
                   </h2>
-                  <p className="text-black/40 mb-10 max-w-sm leading-relaxed font-medium text-base">Connect your invisible wallet or continue as a guest to access your dashboard.</p>
+                  <p className="text-black/40 mb-10 max-w-sm leading-relaxed font-medium text-base">{t("dash.connectGuest")}</p>
                   <ConnectButton client={client} theme={customLightTheme}
                     wallets={[inAppWallet({ auth: { options: ["google", "email", "passkey", "guest"] } })]} />
                 </div>
@@ -589,7 +596,7 @@ export function DashboardComponent() {
             {/* Gradient header strip */}
             <div className="h-1.5 bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-orange-500" />
             <div className="flex items-center justify-between p-5 border-b border-black/5">
-              <h3 className="font-black text-lg text-black tracking-tight">Asset Details</h3>
+              <h3 className="font-black text-lg text-black tracking-tight">{t("dash.assetDetails")}</h3>
               <button onClick={() => setSelectedNFT(null)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
                 <X className="h-5 w-5 text-black/40" />
               </button>
@@ -604,7 +611,7 @@ export function DashboardComponent() {
               )}
               <div className="bg-black/[0.03] rounded-[16px] p-4 border border-black/5 flex flex-col gap-3">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-black/40 font-bold">Token ID</span>
+                  <span className="text-black/40 font-bold">{t("dash.tokenId")}</span>
                   <span className="font-mono font-black text-black">#{selectedNFT.id.toString()}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
@@ -612,7 +619,7 @@ export function DashboardComponent() {
                   <span className="font-black text-black">Base Sepolia</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-black/40 font-bold">Standard</span>
+                  <span className="text-black/40 font-bold">{t("dash.standard")}</span>
                   <span className="font-black text-black">ERC-1155</span>
                 </div>
               </div>
@@ -623,7 +630,7 @@ export function DashboardComponent() {
                   className="w-full flex items-center justify-center gap-2 bg-black hover:bg-black/90 text-white py-3.5 px-4 rounded-[16px] font-black text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-[0_8px_20px_rgba(0,0,0,0.15)] uppercase tracking-wider"
                   onClick={() => toast.info("Opening on OpenSea Testnet...")}
                 >
-                  View on OpenSea <ExternalLink className="h-4 w-4" />
+                  {t("dash.viewOpensea")} <ExternalLink className="h-4 w-4" />
                 </a>
                 <a
                   href={`https://sepolia.basescan.org/token/0xe5492494c0423394A4a1FaaB6E733C35580F9BF9?a=${selectedNFT.id}`}
@@ -631,7 +638,7 @@ export function DashboardComponent() {
                   className="w-full flex items-center justify-center gap-2 bg-black/[0.04] hover:bg-black/[0.08] text-black py-3.5 px-4 rounded-[16px] font-black text-sm transition-all border border-black/5 uppercase tracking-wider"
                   onClick={() => toast.info("Opening BaseScan...")}
                 >
-                  Verify on BaseScan <ExternalLink className="h-4 w-4" />
+                  {t("dash.verifyBasescan")} <ExternalLink className="h-4 w-4" />
                 </a>
               </div>
             </div>

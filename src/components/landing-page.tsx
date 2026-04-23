@@ -8,6 +8,8 @@ import { inAppWallet, createWallet } from "thirdweb/wallets";
 import { client, chain } from "@/app/const/client";
 import { motion } from "framer-motion";
 import { Hexagon, Zap, Globe, Timer, Search, Shield, Mail, FileText, LayoutGrid, Smartphone, Diamond, Cpu, Globe2, Palette, Watch, Github, Linkedin, ExternalLink, ArrowRight } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { LanguageSwitcher } from "@/lib/i18n/LanguageSwitcher";
 
 const phygitalLogo = "/phygital_ultra_logo.png";
 
@@ -69,8 +71,10 @@ export function LandingPage() {
 }
 
 /* ── NavBar ─────────────────────────────────────────────────── */
+
 function NavBar({ account, wallet, disconnect, handleConnect, scroll }: any) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handle = () => setIsScrolled(window.scrollY > 20);
@@ -89,7 +93,11 @@ function NavBar({ account, wallet, disconnect, handleConnect, scroll }: any) {
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
-          {[["How it Works","how-it-works"],["Create","create"],["Features","features"]].map(([label,id]) => (
+          {[
+            [t("nav.howItWorks"),"how-it-works"],
+            [t("nav.create"),"create"],
+            [t("nav.features"),"features"]
+          ].map(([label,id]) => (
             <button key={id} onClick={() => scroll(id)}
               className="text-sm font-bold text-black/50 hover:text-black transition-colors duration-300">
               {label}
@@ -97,20 +105,26 @@ function NavBar({ account, wallet, disconnect, handleConnect, scroll }: any) {
           ))}
           <Link href="/explore" className="text-sm font-bold text-indigo-600 flex items-center gap-1.5 hover:text-indigo-800 transition-colors">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Explore
+            {t("nav.explore")}
           </Link>
         </div>
 
         <div className="flex items-center gap-4">
+          <LanguageSwitcher />
           {account ? (
-            <button onClick={() => { if (wallet) disconnect(wallet); }}
-              className="px-6 py-2.5 text-sm font-bold text-black/40 hover:text-red-500 transition-colors border border-black/5 rounded-xl">
-              Sign Out
-            </button>
+            <>
+              <Link href="/dashboard" className="hidden sm:block px-6 py-2.5 text-sm font-bold text-black hover:text-indigo-600 transition-colors border border-black/5 rounded-xl">
+                {t("nav.dashboard")}
+              </Link>
+              <button onClick={() => { if (wallet) disconnect(wallet); }}
+                className="px-6 py-2.5 text-sm font-bold text-black/40 hover:text-red-500 transition-colors border border-black/5 rounded-xl">
+                {t("nav.signOut")}
+              </button>
+            </>
           ) : (
             <button onClick={handleConnect}
               className="px-8 py-3 bg-black text-white text-sm font-black rounded-2xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] transition-all duration-300 hover:-translate-y-0.5">
-              Connect Wallet
+              {t("nav.connect")}
             </button>
           )}
         </div>
@@ -121,6 +135,7 @@ function NavBar({ account, wallet, disconnect, handleConnect, scroll }: any) {
 
 /* ── HeroSection (High Contrast / Stunning) ─────────────────── */
 function HeroSection({ handleConnect }: any) {
+  const { t } = useLanguage();
   return (
     <header className="relative min-h-[90vh] flex items-center overflow-hidden bg-white pt-24 pb-12 sm:pb-0">
       {/* Abstract Background Elements */}
@@ -139,7 +154,7 @@ function HeroSection({ handleConnect }: any) {
             className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-black/5 border border-black/5 backdrop-blur-xl"
           >
             <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
-            <span className="text-xs font-black text-black/60 uppercase tracking-[0.2em]">Next-Gen Physical Commerce</span>
+            <span className="text-xs font-black text-black/60 uppercase tracking-[0.2em]">{t("hero.badge")}</span>
           </motion.div>
 
           <motion.h1 
@@ -148,9 +163,9 @@ function HeroSection({ handleConnect }: any) {
             transition={{ delay: 0.1 }}
             className="text-6xl sm:text-7xl lg:text-9xl font-black tracking-[-0.05em] leading-[0.85] text-black"
           >
-            The Physical<br />
+            {t("hero.title")}<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-orange-500">
-              Goes On-Chain.
+              {t("hero.titleHighlight")}
             </span>
           </motion.h1>
 
@@ -160,7 +175,7 @@ function HeroSection({ handleConnect }: any) {
             transition={{ delay: 0.2 }}
             className="text-xl sm:text-2xl text-black/50 max-w-xl font-medium leading-tight"
           >
-            Bridge the gap between physical artifacts and digital scarcity. Print a secure identity, claim an immutable token, own the reality.
+            {t("hero.subtitle")}
           </motion.p>
 
           <motion.div 
@@ -171,12 +186,12 @@ function HeroSection({ handleConnect }: any) {
           >
             <button onClick={handleConnect}
               className="group relative px-10 py-5 bg-black text-white font-black rounded-[24px] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-3">
-              <span className="relative z-10 uppercase tracking-widest text-lg">Start Minting</span>
+              <span className="relative z-10 uppercase tracking-widest text-lg">{t("hero.startCreating")}</span>
               <ArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform" />
             </button>
             <button onClick={handleConnect}
               className="px-10 py-5 bg-white border-2 border-black text-black font-black rounded-[24px] hover:bg-black hover:text-white transition-all duration-500 uppercase tracking-widest text-lg">
-              Explore Drops
+              {t("hero.exploreCollection")}
             </button>
           </motion.div>
 
@@ -262,10 +277,11 @@ function HeroSection({ handleConnect }: any) {
 
 /* ── StatsBar (Transition to Dark) ─────────────────────────── */
 function StatsBar() {
+  const { t } = useLanguage();
   const stats = [
-    { val:"1.2M+", label:"Total Assets", icon:Hexagon, color:"text-indigo-600", bg:"bg-indigo-50" },
-    { val:"45K+",  label:"Global Creators", icon:Globe2, color:"text-emerald-600", bg:"bg-emerald-50" },
-    { val:"$850M", label:"Vaulted Value", icon:Diamond, color:"text-blue-600", bg:"bg-blue-50" },
+    { val:t("stats.volume"), label:t("stats.volumeLabel"), icon:Hexagon, color:"text-indigo-600", bg:"bg-indigo-50" },
+    { val:t("stats.assets"), label:t("stats.assetsLabel"), icon:Globe2, color:"text-emerald-600", bg:"bg-emerald-50" },
+    { val:t("stats.creators"), label:t("stats.creatorsLabel"), icon:Diamond, color:"text-blue-600", bg:"bg-blue-50" },
     { val:"< 30s", label:"Claim Time", icon:Timer, color:"text-fuchsia-600", bg:"bg-fuchsia-50" },
   ];
   return (
@@ -296,19 +312,21 @@ function StatsBar() {
 
 /* ── CollectorsSection (Journey) ── */
 function CollectorsSection() {
+  const { t } = useLanguage();
   const steps = [
-    { n:"01", icon:Smartphone, title:"Scan Artifact", desc:"Activate the NFC prism or scan the high-res QR embedded in your physical artifact. No app required.", color:"#4f46e5" },
-    { n:"02", icon:Shield, title:"Claim Digital Twin", desc:"Sign in via Google or Passkey. Mint the 1:1 on-chain verification token to your private vault in seconds.", color:"#ec4899" },
-    { n:"03", icon:Diamond, title:"Vault or Trade", desc:"Hold your digital twin for governance points, list it on our marketplace, or showcase it in your social gallery.", color:"#10b981" },
+    { n:"01", icon:Smartphone, title:t("col.f1.title"), desc:t("col.f1.desc"), color:"#4f46e5" },
+    { n:"02", icon:Shield, title:t("col.f2.title"), desc:t("col.f2.desc"), color:"#ec4899" },
+    { n:"03", icon:Diamond, title:t("col.f3.title"), desc:t("col.f3.desc"), color:"#10b981" },
   ];
   return (
     <section id="how-it-works" className="w-full py-32 sm:py-48 bg-[#f1f3f9] scroll-mt-20 relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         <div className="text-center mb-32">
-          <motion.span className="text-indigo-600 font-black tracking-[0.3em] uppercase text-xs mb-6 block">The Protocol</motion.span>
+          <motion.span className="text-indigo-600 font-black tracking-[0.3em] uppercase text-xs mb-6 block">{t("col.badge")}</motion.span>
           <motion.h2 className="text-6xl sm:text-8xl font-black text-black tracking-tighter leading-none">
-            Physical to<br />Immutable.
+            {t("col.title")}
           </motion.h2>
+          <p className="mt-8 text-black/50 text-xl font-medium max-w-2xl mx-auto">{t("col.desc")}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
@@ -337,6 +355,7 @@ function CollectorsSection() {
 
 /* ── CreatorsSection (The World - Dark & Magical) ── */
 function CreatorsSection({ handleConnect }: any) {
+  const { t } = useLanguage();
   return (
     <section id="create" className="w-full py-40 bg-[#0c0c1d] scroll-mt-20 relative overflow-hidden">
       {/* Abstract Orbs */}
@@ -385,17 +404,16 @@ function CreatorsSection({ handleConnect }: any) {
 
           {/* Right: Content */}
           <div className="flex-1 w-full text-center lg:text-left order-1 lg:order-2">
-            <motion.span className="text-fuchsia-500 font-black tracking-[0.4em] uppercase text-xs mb-8 block">Global Deployment</motion.span>
+            <motion.span className="text-fuchsia-500 font-black tracking-[0.4em] uppercase text-xs mb-8 block">{t("cre.badge")}</motion.span>
             <motion.h2 className="text-6xl sm:text-8xl font-black text-white tracking-tighter leading-[0.8] mb-10">
-              The World is<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-fuchsia-400">Digital Now.</span>
+              {t("cre.title")}
             </motion.h2>
             <p className="text-xl text-white/40 leading-relaxed mb-12 max-w-md mx-auto lg:mx-0 font-medium">
-              Join the ecosystem of creators linking physical masterpieces to digital permanence. One scan, eternal ownership.
+              {t("cre.desc")}
             </p>
             <button onClick={handleConnect}
               className="group relative px-12 py-6 bg-white text-black font-black rounded-[28px] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_30px_60px_rgba(255,255,255,0.1)] uppercase tracking-[0.2em] text-lg">
-              Start Your Voyage
+              {t("hero.startCreating")}
             </button>
           </div>
         </div>
@@ -406,20 +424,21 @@ function CreatorsSection({ handleConnect }: any) {
 
 /* ── FeaturesSection (White Background) ── */
 function FeaturesSection() {
+  const { t } = useLanguage();
   const features = [
-    { title:"Instant Verification", desc:"AI-powered authentication for every physical artifact in your collection. Trustless and instant.", icon:Search, span:"col-span-1 sm:col-span-2", bg:"bg-indigo-50", text:"text-indigo-600" },
-    { title:"Secure Vaulting", desc:"Military-grade multi-sig protection for your assets.", icon:Shield, bg:"bg-emerald-50", text:"text-emerald-600" },
-    { title:"Universal Drops", desc:"Cross-chain compatibility. Sell on any major marketplace.", icon:Globe, bg:"bg-blue-50", text:"text-blue-600" },
-    { title:"Invisible Wallets", desc:"No seed phrases. Zero friction onboarding for everyone.", icon:Zap, span:"col-span-1 sm:col-span-2", bg:"bg-fuchsia-50", text:"text-fuchsia-600" },
-    { title:"Email Receipts", desc:"Automated confirmation for every claim or trade.", icon:Mail, bg:"bg-rose-50", text:"text-rose-600" },
-    { title:"Certificate Export", desc:"Branded PDF authenticity certificates available instantly.", icon:FileText, bg:"bg-amber-50", text:"text-amber-600" },
+    { title:t("feat.f1.title"), desc:t("feat.f1.desc"), icon:Search, span:"col-span-1 sm:col-span-2", bg:"bg-indigo-50", text:"text-indigo-600" },
+    { title:t("feat.f2.title"), desc:t("feat.f2.desc"), icon:Shield, bg:"bg-emerald-50", text:"text-emerald-600" },
+    { title:t("feat.f3.title"), desc:t("feat.f3.desc"), icon:Globe, bg:"bg-blue-50", text:"text-blue-600" },
+    { title:t("feat.f4.title"), desc:t("feat.f4.desc"), icon:Zap, span:"col-span-1 sm:col-span-2", bg:"bg-fuchsia-50", text:"text-fuchsia-600" },
+    { title:t("feat.f5.title"), desc:t("feat.f5.desc"), icon:Mail, bg:"bg-rose-50", text:"text-rose-600" },
+    { title:t("feat.f6.title"), desc:t("feat.f6.desc"), icon:FileText, bg:"bg-amber-50", text:"text-amber-600" },
   ];
   return (
     <section id="features" className="w-full py-40 bg-white scroll-mt-20 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="text-center mb-32">
-          <h2 className="text-6xl sm:text-8xl font-black tracking-tighter text-black mb-10">Built for Scale.</h2>
-          <p className="text-xl text-black/40 max-w-2xl mx-auto font-medium leading-relaxed">Industrial-grade infrastructure for the next generation of physical drops and high-value artifacts.</p>
+          <motion.span className="text-indigo-600 font-black tracking-[0.3em] uppercase text-xs mb-6 block">{t("feat.badge")}</motion.span>
+          <h2 className="text-6xl sm:text-8xl font-black tracking-tighter text-black mb-10">{t("feat.title")}</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
@@ -445,6 +464,7 @@ function FeaturesSection() {
 
 /* ── CtaSection (Stunning Redesign) ────────────────────────── */
 function CtaSection({ handleConnect }: any) {
+  const { t } = useLanguage();
   return (
     <section className="w-full py-32 bg-black relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-transparent to-fuchsia-900/20" />
@@ -455,20 +475,19 @@ function CtaSection({ handleConnect }: any) {
           className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[60px] p-16 sm:p-24"
         >
           <h2 className="text-6xl sm:text-8xl font-black text-white tracking-tighter leading-[0.8] mb-12">
-            Claim Your<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-fuchsia-400 underline decoration-indigo-500/30 underline-offset-[20px]">Identity.</span>
+            {t("cta.title")}
           </h2>
           <p className="text-xl sm:text-2xl text-white/40 mb-16 font-medium max-w-xl mx-auto">
-            Ready to link your physical craft to digital permanence? The portal is open.
+            {t("cta.desc")}
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <button onClick={handleConnect}
               className="px-14 py-6 bg-white text-black font-black rounded-3xl hover:bg-indigo-500 hover:text-white transition-all duration-500 uppercase tracking-widest text-xl shadow-2xl shadow-white/10">
-              Create Drop
+              {t("cta.button")}
             </button>
             <button onClick={handleConnect}
               className="px-14 py-6 bg-black border-2 border-white/20 text-white font-black rounded-3xl hover:border-white transition-all uppercase tracking-widest text-xl">
-              Buy NFT
+              {t("hero.exploreCollection")}
             </button>
           </div>
         </motion.div>
@@ -479,6 +498,7 @@ function CtaSection({ handleConnect }: any) {
 
 /* ── Phygital Footer (Redesigned) ───────────────────────────── */
 function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
+  const { t } = useLanguage();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const animRef = useRef<number>(0);
@@ -576,7 +596,7 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
              <span className="text-2xl font-black tracking-tighter">Phygital</span>
            </div>
            <p className="text-white/40 text-sm font-medium max-w-xs leading-relaxed">
-             Bridging the atomic and the digital worlds through immutable proof of reality.
+             {t("foot.desc")}
            </p>
            <div className="flex items-center gap-4">
              <a href="mailto:tanish@phygital.xyz" className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center hover:bg-indigo-600 transition-all">
@@ -593,36 +613,40 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
 
         {/* Navigation */}
         <div className="space-y-6">
-           <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Platform</h4>
+           <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">{t("foot.platform")}</h4>
            <div className="flex flex-col gap-4">
-             {[["Protocol Journey","how-it-works"],["Create Drop","create"],["Technology","features"]].map(([lbl,id]) => (
-               <button key={id} onClick={() => scroll(id)} className="text-sm font-bold text-white/50 hover:text-white transition-colors text-left">{lbl}</button>
+             {[
+               [t("foot.protocolJourney"), "how-it-works"],
+               [t("foot.createDrop"), "create"],
+               [t("foot.technology"), "features"]
+             ].map(([lbl, id]) => (
+               <button key={id} onClick={() => scroll(id as string)} className="text-sm font-bold text-white/50 hover:text-white transition-colors text-left">{lbl}</button>
              ))}
-             <Link href="/explore" className="text-sm font-bold text-indigo-400 hover:text-indigo-300">Marketplace</Link>
+             <Link href="/explore" className="text-sm font-bold text-indigo-400 hover:text-indigo-300">{t("foot.marketplace")}</Link>
            </div>
         </div>
 
         {/* Resources */}
         <div className="space-y-6">
-           <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Developer</h4>
+           <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">{t("foot.developer")}</h4>
            <div className="flex flex-col gap-4">
-             <a href="https://github.com/trigno1" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2">GitHub <ExternalLink size={14} /></a>
-             <a href="https://basescan.org" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2">BaseScan <ExternalLink size={14} /></a>
-             <a href="https://www.linkedin.com/in/tanish-sunita-pareek/" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2">LinkedIn <ExternalLink size={14} /></a>
+             <a href="https://github.com/trigno1" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2">{t("foot.github")} <ExternalLink size={14} /></a>
+             <a href="https://basescan.org" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2">{t("foot.basescan")} <ExternalLink size={14} /></a>
+             <a href="https://www.linkedin.com/in/tanish-sunita-pareek/" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2">{t("foot.linkedin")} <ExternalLink size={14} /></a>
            </div>
         </div>
 
         {/* Legal + Credits */}
         <div className="space-y-6 bg-white/5 p-8 rounded-[32px] border border-white/5">
-           <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">Credits</h4>
+           <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">{t("foot.credits")}</h4>
            <div className="space-y-1">
              <p className="text-lg font-black">Tanish S. Pareek</p>
-             <p className="text-xs text-white/40 font-medium">BCA Semester 5 Project · 2025</p>
+             <p className="text-xs text-white/40 font-medium">{t("foot.bcaProject")}</p>
            </div>
            <div className="pt-4 border-t border-white/5 space-y-2">
              <p className="text-[10px] text-white/20 uppercase tracking-widest leading-loose">
-               Built on Base Network<br />
-               Privacy · Terms · Legal
+               {t("foot.builtOn")}<br />
+               {t("foot.privacyTerms")}
              </p>
            </div>
         </div>

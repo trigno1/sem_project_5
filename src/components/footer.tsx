@@ -1,6 +1,8 @@
+"use client"
 import Link from "next/link";
 import Image from "next/image";
 import { Github, Mail, Linkedin } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const DEVELOPER = {
   name: "Tanish S Pareek",
@@ -14,6 +16,7 @@ interface FooterProps {
 }
 
 export function Footer({ dark = false }: FooterProps) {
+  const { t } = useLanguage();
   const bg = dark ? "bg-[#050510] border-t border-white/5" : "bg-stone-50 border-t border-stone-200";
   const textTitle = dark ? "text-white" : "text-stone-900";
   const textSub = dark ? "text-white/50" : "text-stone-500";
@@ -33,12 +36,12 @@ export function Footer({ dark = false }: FooterProps) {
             <Image src="/phygital_ultra_logo.png" alt="Phygital Logo" width={32} height={32} className="object-contain" />
             <span className={`text-xl font-black tracking-tight ${textTitle}`}>Phygital</span>
           </div>
-          <p className={`text-sm font-medium ${textSub}`}>Physical NFT Drops on Base Sepolia</p>
+          <p className={`text-sm font-medium ${textSub}`}>{t("foot.desc")}</p>
         </div>
 
         {/* Developer Credit */}
         <div className="text-center flex flex-col items-center">
-          <span className={`text-xs font-semibold uppercase tracking-widest mb-1 ${textSub}`}>Developed by</span>
+          <span className={`text-xs font-semibold uppercase tracking-widest mb-1 ${textSub}`}>{t("foot.developerLabel")}</span>
           <span className={`text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-violet-500`}>
             {DEVELOPER.name}
           </span>

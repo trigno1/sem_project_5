@@ -115,9 +115,10 @@ export function DashboardComponent() {
       if (!res.ok) { toast.error("Failed to regenerate QR"); return }
       const link = document.createElement("a")
       link.href = data.qrDataUrl
-      link.download = `phygital-qr-${drop.name.replace(/\s+/g, "-").toLowerCase()}.png`
+      const ext = data.qrDataUrl.startsWith("data:image/svg") ? "svg" : "png"
+      link.download = `phygital-qr-${drop.name.replace(/\s+/g, "-").toLowerCase()}.${ext}`
       link.click()
-      toast.success("QR downloaded!", { description: `phygital-qr-${drop.name.toLowerCase()}.png` })
+      toast.success("QR downloaded!", { description: `phygital-qr-${drop.name.toLowerCase()}.${ext}` })
     } catch {
       toast.error("Could not download QR")
     } finally {
@@ -159,7 +160,7 @@ export function DashboardComponent() {
             <div className="relative w-10 h-10 transition-transform duration-500 group-hover:scale-110">
               <Image src="/phygital_ultra_logo.png" alt="Phygital Logo" width={40} height={40} className="w-full h-full object-contain" />
             </div>
-            <span className="text-2xl font-black text-black tracking-tighter">Phygital</span>
+            <span className="text-2xl font-black text-black tracking-tighter">{t("foot.brandName") || "Phygital"}</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSwitcher />

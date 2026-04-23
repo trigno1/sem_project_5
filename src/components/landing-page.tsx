@@ -85,11 +85,11 @@ function NavBar({ account, wallet, disconnect, handleConnect, scroll }: any) {
   return (
     <nav className={`fixed top-0 w-full z-[100] transition-all duration-500 ${isScrolled ? "bg-white/80 backdrop-blur-2xl border-b border-black/5 py-3" : "bg-transparent py-5"}`}>
       <div className="flex items-center justify-between px-6 lg:px-10 py-2 max-w-[1440px] mx-auto">
-        <Link href="/" className="flex items-center gap-4 group">
-          <div className="relative w-11 h-11 transition-transform duration-500 group-hover:scale-110">
-            <img src={phygitalLogo} alt="Phygital Logo" className="w-full h-full object-contain" />
+        <Link href="/" className="flex items-center gap-3 group hover:opacity-80 transition-opacity">
+          <div className="relative w-10 h-10 transition-transform duration-500 group-hover:scale-110">
+            <img src={phygitalLogo} alt="Logo" className="w-full h-full object-contain drop-shadow-md" />
           </div>
-          <span className="text-2xl font-black tracking-tighter transition-colors text-black">Phygital</span>
+          <span className="text-2xl font-black tracking-tighter transition-colors text-black">{t("foot.brandName") || "Phygital"}</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
@@ -498,7 +498,7 @@ function CtaSection({ handleConnect }: any) {
 
 /* ── Phygital Footer (Redesigned) ───────────────────────────── */
 function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const animRef = useRef<number>(0);
@@ -525,7 +525,8 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
     oc.textAlign = "center";
     oc.textBaseline = "middle";
     oc.letterSpacing = "2px";
-    oc.fillText("PHYGITAL", W / 2, H / 2);
+    const brandText = t("foot.brandName") || "PHYGITAL";
+    oc.fillText(brandText.toUpperCase(), W / 2, H / 2);
 
     const imgData = oc.getImageData(0, 0, W, H).data;
     const targets: { x: number; y: number }[] = [];
@@ -563,8 +564,9 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
       }
     };
     cancelAnimationFrame(animRef.current);
+    cancelAnimationFrame(animRef.current);
     animRef.current = requestAnimationFrame(draw);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -579,6 +581,12 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
     return () => { obs.disconnect(); cancelAnimationFrame(animRef.current); };
   }, [runAnimation]);
 
+  useEffect(() => {
+    if (startedRef.current) {
+      runAnimation();
+    }
+  }, [language, runAnimation]);
+
   return (
     <footer ref={sectionRef as any} className="w-full bg-[#050508] text-white overflow-hidden">
       {/* High-Impact Particle Branding */}
@@ -586,14 +594,14 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 py-24 grid grid-cols-1 md:grid-cols-4 gap-16 items-start border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-8 py-24 grid grid-cols-1 md:grid-cols-3 gap-16 items-start border-t border-white/5">
         {/* Brand + Contacts */}
         <div className="space-y-8">
-           <div className="flex items-center gap-3">
+             <div className="flex items-center gap-3">
              <div className="w-12 h-12 flex items-center justify-center">
                 <img src={phygitalLogo} alt="Logo" className="w-full h-full object-contain" />
              </div>
-             <span className="text-2xl font-black tracking-tighter">Phygital</span>
+             <span className="text-2xl font-black tracking-tighter">{t("foot.brandName") || "Phygital"}</span>
            </div>
            <p className="text-white/40 text-sm font-medium max-w-xs leading-relaxed">
              {t("foot.desc")}
@@ -609,6 +617,16 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
                 <Linkedin size={20} />
              </a>
            </div>
+           <div className="pt-8 border-t border-white/5 space-y-4">
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <Link href="/privacy" className="text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-indigo-400 transition-colors">Privacy</Link>
+                <Link href="/terms" className="text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-indigo-400 transition-colors">Terms</Link>
+                <Link href="/legal" className="text-[10px] font-bold uppercase tracking-widest text-white/20 hover:text-indigo-400 transition-colors">Legal</Link>
+              </div>
+              <p className="text-[10px] text-white/10 font-bold uppercase tracking-[0.2em]">
+                {t("foot.builtOn")}
+              </p>
+            </div>
         </div>
 
         {/* Navigation */}
@@ -626,30 +644,51 @@ function PhygitalFooter({ scroll }: { scroll: (id: string) => void }) {
            </div>
         </div>
 
-        {/* Resources */}
-        <div className="space-y-6">
-           <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">{t("foot.developer")}</h4>
-           <div className="flex flex-col gap-4">
-             <a href="https://github.com/trigno1" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2">{t("foot.github")} <ExternalLink size={14} /></a>
-             <a href="https://basescan.org" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2">{t("foot.basescan")} <ExternalLink size={14} /></a>
-             <a href="https://www.linkedin.com/in/tanish-sunita-pareek/" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/50 hover:text-white flex items-center gap-2">{t("foot.linkedin")} <ExternalLink size={14} /></a>
-           </div>
-        </div>
 
-        {/* Legal + Credits */}
-        <div className="space-y-6 bg-white/5 p-8 rounded-[32px] border border-white/5">
-           <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/30">{t("foot.credits")}</h4>
-           <div className="space-y-1">
-             <p className="text-lg font-black">Tanish S. Pareek</p>
-             <p className="text-xs text-white/40 font-medium">{t("foot.bcaProject")}</p>
+
+        {/* Refined Developer Card */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          whileHover={{ y: -5 }}
+          className="relative group flex flex-col items-center text-center space-y-6 bg-[#08081a] p-10 rounded-[40px] border border-indigo-500/10 backdrop-blur-2xl overflow-hidden transition-all duration-500 hover:border-indigo-500/40 hover:shadow-[0_0_50px_-12px_rgba(99,102,241,0.3)]"
+        >
+           {/* Dynamic Background Glows */}
+           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-500/[0.05] via-transparent to-purple-500/[0.05]" />
+           <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/20 blur-[100px] rounded-full group-hover:bg-indigo-600/30 transition-colors duration-700" />
+           <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-600/10 blur-[100px] rounded-full group-hover:bg-purple-600/20 transition-colors duration-700" />
+
+           <div className="relative z-10 space-y-8 w-full">
+             <div className="space-y-4">
+               <span className="text-[9px] font-black uppercase tracking-[0.5em] text-indigo-400/50">
+                 developed and maintained by
+               </span>
+               <p className="text-2xl font-black tracking-tighter text-white">
+                 Tanish S. Pareek
+               </p>
+             </div>
+
+             <div className="flex items-center justify-center gap-4">
+               {[
+                 { icon: Linkedin, href: "https://linkedin.com/in/tanishsunitapareek", label: "LinkedIn", color: "hover:bg-blue-600/20 hover:text-blue-400" },
+                 { icon: Github, href: "https://github.com/trigno1", label: "GitHub", color: "hover:bg-white/10 hover:text-white" },
+                 { icon: Mail, href: "mailto:tanish@phygital.xyz", label: "Email", color: "hover:bg-indigo-600/20 hover:text-indigo-400" }
+               ].map((social, idx) => (
+                 <a 
+                   key={idx}
+                   href={social.href}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className={`w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center transition-all duration-500 hover:scale-110 hover:-translate-y-1 ${social.color}`}
+                   aria-label={social.label}
+                 >
+                   <social.icon size={20} />
+                 </a>
+               ))}
+             </div>
            </div>
-           <div className="pt-4 border-t border-white/5 space-y-2">
-             <p className="text-[10px] text-white/20 uppercase tracking-widest leading-loose">
-               {t("foot.builtOn")}<br />
-               {t("foot.privacyTerms")}
-             </p>
-           </div>
-        </div>
+        </motion.div>
       </div>
       
       <div className="max-w-7xl mx-auto px-8 pb-12 flex justify-between items-center text-[10px] font-black text-white/10 uppercase tracking-[0.5em]">

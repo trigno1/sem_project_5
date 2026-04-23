@@ -203,7 +203,8 @@ export default function CreatePage() {
     if (!result) return;
     const a = document.createElement("a");
     a.href = result.qrDataUrl;
-    a.download = `phygital-qr-${result.id.slice(0, 8)}.png`;
+    const ext = result.qrDataUrl.startsWith("data:image/svg") ? "svg" : "png";
+    a.download = `phygital-qr-${result.id.slice(0, 8)}.${ext}`;
     a.click();
   };
 
